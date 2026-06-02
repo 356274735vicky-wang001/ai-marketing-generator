@@ -12,8 +12,8 @@ interface Props {
 
 export function ActionBar({ generating, onGenerate, onReset, onClear }: Props) {
   return (
-    <div className="flex flex-wrap gap-2">
-      <Button onClick={onGenerate} disabled={generating} size="lg" className="flex-1 min-w-[160px]">
+    <div className="flex items-center gap-2">
+      <Button onClick={onGenerate} disabled={generating} className="flex-1">
         {generating ? (
           <>
             <Loader2 className="animate-spin" /> 正在生成…
@@ -25,10 +25,10 @@ export function ActionBar({ generating, onGenerate, onReset, onClear }: Props) {
         )}
       </Button>
       <Button variant="outline" onClick={onReset} disabled={generating}>
-        <RotateCcw /> 重置默认值
+        <RotateCcw /> 恢复默认
       </Button>
       <Button variant="ghost" onClick={onClear} disabled={generating}>
-        <Eraser /> 清空输入
+        <Eraser /> 清空内容
       </Button>
     </div>
   );

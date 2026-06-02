@@ -25,11 +25,12 @@ export async function GET(req: NextRequest) {
 
   try {
     const entries: ZipEntry[] = [];
-    for (const [id, stored] of task.images) {
+    for (const [, stored] of task.images) {
       // Doodle 默认始终用 PNG 保留透明，即使整体选 jpg
       const useFormat = stored.spec.isDoodle ? "png" : (format as "png" | "jpg");
       const data = await transcode(stored.png, useFormat);
-      entries.push({ name: `${id}.${useFormat}`, data });
+      // 包内文件名 = 统一展示名，与单张下载 / 预览标题一致
+      entries.push({ name: `${stored.spec.name}.${useFormat}`, data });
     }
     const zip = await buildZip(entries);
     return new NextResponse(new Uint8Array(zip), {

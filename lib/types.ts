@@ -2,34 +2,46 @@
 
 export type DoodleMode = "single" | "double";
 
-/** 前端表单文本/颜色字段（不含文件，文件以 File 单独管理） */
+/**
+ * 前端表单文本/颜色字段（不含文件）。
+ *
+ * 设计原则：每个字段都归属一张具体输出图，颜色按节点逐一作用，不再跨图共用，
+ * 避免运营猜测「这个颜色影响哪张图」。字段名沿用文档 03/04 的语义命名。
+ */
 export interface GenerateTextFields {
-  // 营销图文案（字段名沿用文档 03/04 的语义命名，直接对应工作流节点）
-  copy750Square: string; // #19  750×750 主文案
-  copy530x706: string; // #42  530×706 主文案
-  copy750x400: string; // #74  750×400 主文案
-  title342x514: string; // #86  342×514 主标题
-  benefit342x514: string; // #88  342×514 利益点
+  // —— 营销图1（750×750）——
+  copy750Square: string; // #19 主文案
+  color750Square: string; // #19 标题颜色
 
+  // —— 营销图2（530×706）——
+  copy530x706: string; // #42 主文案
   buttonText530x706: string; // #53 按钮文字
-  buttonText750x400: string; // #66 按钮文字
-  buttonText342x514: string; // #93 按钮文字
-  tagText342x514: string; // #103 标签文案
+  button530BgColor: string; // #48 按钮底色
+  button530TextColor: string; // #52 按钮文字颜色
 
-  // Doodle 文案
+  // —— 营销图3（750×400）——
+  copy750x400: string; // #74 主文案
+  buttonText750x400: string; // #66 按钮文字
+  button750BgColor: string; // #65 按钮底色
+  button750TextColor: string; // #69 按钮文字颜色
+
+  // —— 营销图4（750×750 二楼）：纯视觉合成，无独立文案/颜色节点 ——
+
+  // —— 营销图5（342×514 轮播图）——
+  title342x514: string; // #86 标题文案
+  benefit342x514: string; // #88 利益点文案
+  tagText342x514: string; // #103 标签文案
+  tag342BgColor: string; // #101 标签底色
+  tag342TextColor: string; // #104 标签文字颜色
+  buttonText342x514: string; // #93 按钮文字
+  button342BgColor: string; // #90 按钮底色
+
+  // —— Doodle（162×162）——
   doodleMode: DoodleMode;
   doodleSingleText: string; // #134
   doodleDoubleLine1: string; // #133 第一行
   doodleDoubleLine2: string; // #133 第二行
-
-  // 颜色（HEX，可带或不带 #）
-  titleColor: string; // 主标题文字颜色
-  subtitleColor: string; // 副标题/利益点文字颜色
-  buttonBgColor: string; // 按钮底色
-  buttonTextColor: string; // 按钮文字颜色
-  tagBgColor: string; // 标签底色
-  tagTextColor: string; // 标签文字颜色
-  doodleTextColor: string; // Doodle 文字颜色
+  doodleTextColor: string; // #133/#134 Doodle 文字颜色
 }
 
 /** 上传文件字段 */

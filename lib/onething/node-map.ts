@@ -65,12 +65,14 @@ export const TEXT_BINDINGS: TextBinding[] = [
 
 type ColorFieldKey = Extract<
   TextFieldKey,
-  | "titleColor"
-  | "subtitleColor"
-  | "buttonBgColor"
-  | "buttonTextColor"
-  | "tagBgColor"
-  | "tagTextColor"
+  | "color750Square"
+  | "button530BgColor"
+  | "button530TextColor"
+  | "button750BgColor"
+  | "button750TextColor"
+  | "tag342BgColor"
+  | "tag342TextColor"
+  | "button342BgColor"
   | "doodleTextColor"
 >;
 
@@ -81,29 +83,22 @@ export interface ColorBinding {
 }
 
 /**
- * 颜色绑定。前端按 PRD 第 6 节仅暴露 7 个颜色字段，
- * 一个字段可统一作用于多个同语义节点（用户选定颜色会覆盖各节点默认值）。
+ * 颜色绑定：每个颜色字段精确作用于「它所属那张图」的单个节点，不跨图共用。
  * 不含 Doodle 文字颜色 —— 由 builder 按模式只作用于当前模式对应节点。
  */
 export const COLOR_BINDINGS: ColorBinding[] = [
-  // 主标题/主文案文字颜色
-  { field: "titleColor", nodeId: 19, op: "overlayColor" },
-  { field: "titleColor", nodeId: 42, op: "overlayColor" },
-  { field: "titleColor", nodeId: 74, op: "overlayColor" },
-  { field: "titleColor", nodeId: 86, op: "overlayColor" },
-  // 副标题/利益点文字颜色
-  { field: "subtitleColor", nodeId: 88, op: "overlayColor" },
-  // 按钮文字颜色（CR Overlay Text）
-  { field: "buttonTextColor", nodeId: 52, op: "overlayColor" },
-  { field: "buttonTextColor", nodeId: 69, op: "overlayColor" },
-  // 标签文字颜色（CR Overlay Text，文字来自 #103）
-  { field: "tagTextColor", nodeId: 104, op: "overlayColor" },
-  // 按钮底色（CR Color Panel）
-  { field: "buttonBgColor", nodeId: 48, op: "panelColor" },
-  { field: "buttonBgColor", nodeId: 65, op: "panelColor" },
-  { field: "buttonBgColor", nodeId: 90, op: "panelColor" },
-  // 标签底色（CR Color Panel）
-  { field: "tagBgColor", nodeId: 101, op: "panelColor" },
+  // 营销图1（750×750）
+  { field: "color750Square", nodeId: 19, op: "overlayColor" }, // 标题颜色
+  // 营销图2（530×706）
+  { field: "button530BgColor", nodeId: 48, op: "panelColor" }, // 按钮底色
+  { field: "button530TextColor", nodeId: 52, op: "overlayColor" }, // 按钮文字颜色
+  // 营销图3（750×400）
+  { field: "button750BgColor", nodeId: 65, op: "panelColor" }, // 按钮底色
+  { field: "button750TextColor", nodeId: 69, op: "overlayColor" }, // 按钮文字颜色
+  // 营销图5（342×514）
+  { field: "tag342BgColor", nodeId: 101, op: "panelColor" }, // 标签底色
+  { field: "tag342TextColor", nodeId: 104, op: "overlayColor" }, // 标签文字颜色
+  { field: "button342BgColor", nodeId: 90, op: "panelColor" }, // 按钮底色
 ];
 
 /** Doodle 专用节点 */
@@ -129,17 +124,31 @@ export interface OutputSpec {
   hasAlpha: boolean;
 }
 
+/**
+ * 统一展示名称（唯一数据源）。
+ * 左侧配置卡标题、右侧预览卡标题、下载文件名三处都引用这里，保证完全一致。
+ * 运营只需看「尺寸 + 用途」，无需理解营销图编号。
+ */
+export const OUTPUT_NAMES = {
+  square750: "750×750 方图",
+  vertical530: "530×706 竖图",
+  banner750: "750×400 横版Banner",
+  floor750: "750×750 二楼图",
+  carousel342: "342×514 轮播图",
+  doodle: "Doodle 162×162",
+} as const;
+
 export const MARKETING_OUTPUTS: OutputSpec[] = [
-  { id: "marketing_750x750_1", name: "750×750 方图", width: 750, height: 750, isDoodle: false, hasAlpha: false },
-  { id: "marketing_530x706", name: "530×706 竖图", width: 530, height: 706, isDoodle: false, hasAlpha: false },
-  { id: "marketing_750x400", name: "750×400 横版 Banner", width: 750, height: 400, isDoodle: false, hasAlpha: false },
-  { id: "marketing_750x750_2", name: "750×750 二楼图", width: 750, height: 750, isDoodle: false, hasAlpha: false },
-  { id: "marketing_342x514", name: "342×514 轮播图", width: 342, height: 514, isDoodle: false, hasAlpha: false },
+  { id: "marketing_750x750_1", name: OUTPUT_NAMES.square750, width: 750, height: 750, isDoodle: false, hasAlpha: false },
+  { id: "marketing_530x706", name: OUTPUT_NAMES.vertical530, width: 530, height: 706, isDoodle: false, hasAlpha: false },
+  { id: "marketing_750x400", name: OUTPUT_NAMES.banner750, width: 750, height: 400, isDoodle: false, hasAlpha: false },
+  { id: "marketing_750x750_2", name: OUTPUT_NAMES.floor750, width: 750, height: 750, isDoodle: false, hasAlpha: false },
+  { id: "marketing_342x514", name: OUTPUT_NAMES.carousel342, width: 342, height: 514, isDoodle: false, hasAlpha: false },
 ];
 
 export const DOODLE_OUTPUT_SINGLE: OutputSpec = {
   id: "doodle_single",
-  name: "Doodle（单行）",
+  name: OUTPUT_NAMES.doodle,
   width: 162,
   height: 162,
   isDoodle: true,
@@ -148,7 +157,7 @@ export const DOODLE_OUTPUT_SINGLE: OutputSpec = {
 
 export const DOODLE_OUTPUT_DOUBLE: OutputSpec = {
   id: "doodle_double",
-  name: "Doodle（双行）",
+  name: OUTPUT_NAMES.doodle,
   width: 162,
   height: 162,
   isDoodle: true,

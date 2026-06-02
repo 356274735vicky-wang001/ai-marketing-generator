@@ -12,27 +12,27 @@ interface Props {
 export function MaterialUploadCard({ files, setFile }: Props) {
   return (
     <Card>
-      <CardHeader>
-        <CardTitle className="text-base">营销图素材</CardTitle>
+      <CardHeader className="pb-2">
+        <CardTitle className="text-sm">营销图素材</CardTitle>
       </CardHeader>
-      <CardContent className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <CardContent className="grid grid-cols-3 gap-3">
         <ImageDropzone
+          compact
           label="背景图"
           value={files.backgroundImage}
           onChange={(f) => setFile("backgroundImage", f)}
-          hint="用于 5 张营销图"
         />
         <ImageDropzone
-          label="主视觉产品图"
+          compact
+          label="主视觉"
           value={files.productImage}
           onChange={(f) => setFile("productImage", f)}
-          hint="建议透明 PNG"
         />
         <ImageDropzone
+          compact
           label="Logo"
           value={files.logoImage}
           onChange={(f) => setFile("logoImage", f)}
-          hint="建议透明 PNG"
         />
       </CardContent>
     </Card>

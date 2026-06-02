@@ -1,10 +1,8 @@
 "use client";
 
-import { Download, PackageOpen } from "lucide-react";
+import { PackageOpen } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
 import { ResultCard } from "./ResultCard";
 import { outputsForMode } from "@/lib/onething/node-map";
 import type { GeneratedImage, TaskResult } from "@/lib/types";
@@ -35,40 +33,31 @@ export function ResultGrid({ mode, generating, result }: Props) {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold">生成结果</h2>
+        <div>
+          <h2 className="text-lg font-semibold">生成结果</h2>
+          <p className="text-xs text-muted-foreground">
+            {generating
+              ? "正在生成 6 张宣传图，请稍候…"
+              : hasResult
+                ? "点击图片可查看大图，支持单张 PNG / JPG 与全部 ZIP 下载。"
+                : "上传素材、填写文案后点击「一键生成」，结果将展示在此。"}
+          </p>
+        </div>
         <Button size="sm" onClick={downloadZip} disabled={!hasResult || generating}>
           <PackageOpen /> 下载全部 ZIP
         </Button>
       </div>
 
-      {generating && (
-        <Card>
-          <CardContent className="space-y-2 p-4">
-            <p className="text-sm text-muted-foreground">正在生成 6 张宣传图，请稍候…</p>
-            <Progress value={66} />
-          </CardContent>
-        </Card>
-      )}
-
-      {!generating && !hasResult && (
-        <Card>
-          <CardContent className="flex flex-col items-center gap-2 p-10 text-center text-muted-foreground">
-            <Download className="h-6 w-6" />
-            <p className="text-sm">上传素材、填写文案后点击「一键生成」，结果将展示在此。</p>
-          </CardContent>
-        </Card>
-      )}
-
+      {/* 默认即展示六宫格占位，生成后原位替换为真实图片 */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        {(generating || hasResult) &&
-          specs.map((spec) => (
-            <ResultCard
-              key={spec.id}
-              spec={spec}
-              image={imageById.get(spec.id)}
-              loading={generating && !imageById.get(spec.id)}
-            />
-          ))}
+        {specs.map((spec) => (
+          <ResultCard
+            key={spec.id}
+            spec={spec}
+            image={imageById.get(spec.id)}
+            loading={generating && !imageById.get(spec.id)}
+          />
+        ))}
       </div>
     </div>
   );

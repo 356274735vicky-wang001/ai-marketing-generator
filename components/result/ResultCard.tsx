@@ -45,11 +45,8 @@ export function ResultCard({ spec, image, loading }: Props) {
   return (
     <Card className="overflow-hidden">
       <CardContent className="p-3">
-        <div className="mb-2 flex items-center justify-between">
+        <div className="mb-2">
           <span className="text-sm font-medium">{spec.name}</span>
-          <span className="text-xs text-muted-foreground">
-            {spec.width}×{spec.height}
-          </span>
         </div>
 
         <div
@@ -77,9 +74,7 @@ export function ResultCard({ spec, image, loading }: Props) {
               </DialogTrigger>
               <DialogContent className="max-w-3xl">
                 <DialogHeader>
-                  <DialogTitle>
-                    {spec.name}（{spec.width}×{spec.height}）
-                  </DialogTitle>
+                  <DialogTitle>{spec.name}</DialogTitle>
                 </DialogHeader>
                 <div className={cn("flex justify-center rounded-md", spec.isDoodle && "checkerboard")}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}

@@ -27,12 +27,15 @@ export async function GET(
 
   try {
     const out = await transcode(stored.png, format);
-    const filename = `${imageId}.${format}`;
+    // 文件名 = 统一展示名（与左侧标题 / 右侧预览标题一致）；
+    // 用 RFC 5987 的 filename* 携带中文/×，并保留 ASCII filename 作为回退。
+    const displayName = `${stored.spec.name}.${format}`;
+    const asciiFallback = `${imageId}.${format}`;
     return new NextResponse(new Uint8Array(out), {
       status: 200,
       headers: {
         "Content-Type": contentType(format),
-        "Content-Disposition": `attachment; filename="${filename}"`,
+        "Content-Disposition": `attachment; filename="${asciiFallback}"; filename*=UTF-8''${encodeURIComponent(displayName)}`,
         "Cache-Control": "no-store",
       },
     });
