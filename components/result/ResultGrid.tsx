@@ -5,29 +5,30 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { ResultCard } from "./ResultCard";
 import { outputsForMode } from "@/lib/onething/node-map";
-import type { GeneratedImage, TaskResult } from "@/lib/types";
+import { downloadZip } from "@/lib/client/download";
+import type { GeneratedImage } from "@/lib/types";
 
 interface Props {
   mode: "single" | "double";
   generating: boolean;
-  result: TaskResult | null;
+  images: GeneratedImage[] | null;
 }
 
-export function ResultGrid({ mode, generating, result }: Props) {
+export function ResultGrid({ mode, generating, images }: Props) {
   const specs = outputsForMode(mode);
   const imageById = new Map<string, GeneratedImage>(
-    (result?.images ?? []).map((img) => [img.id, img])
+    (images ?? []).map((img) => [img.id, img])
   );
-  const hasResult = !!result && result.images.length > 0;
+  const hasResult = !!images && images.length > 0;
 
-  function downloadZip() {
-    if (!result) return;
-    const a = document.createElement("a");
-    a.href = `/api/download-zip?taskId=${encodeURIComponent(result.taskId)}&format=png`;
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    toast.success("正在打包下载 ZIP…");
+  async function handleZip() {
+    if (!images || images.length === 0) return;
+    try {
+      await downloadZip(images);
+      toast.success("已开始下载 ZIP。");
+    } catch {
+      toast.error("ZIP 打包失败，请重试。");
+    }
   }
 
   return (
@@ -43,7 +44,7 @@ export function ResultGrid({ mode, generating, result }: Props) {
                 : "上传素材、填写文案后点击「一键生成」，结果将展示在此。"}
           </p>
         </div>
-        <Button size="sm" onClick={downloadZip} disabled={!hasResult || generating}>
+        <Button size="sm" onClick={handleZip} disabled={!hasResult || generating}>
           <PackageOpen /> 下载全部 ZIP
         </Button>
       </div>

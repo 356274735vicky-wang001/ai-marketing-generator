@@ -9,7 +9,7 @@ import { ActionBar } from "@/components/config-panel/ActionBar";
 import { ResultGrid } from "@/components/result/ResultGrid";
 import { DEFAULT_TEXT_FIELDS } from "@/lib/form-schema";
 import { isValidHex } from "@/lib/onething/hex";
-import type { GenerateTextFields, TaskResult, UploadFieldKey } from "@/lib/types";
+import type { GeneratedImage, GenerateResponse, GenerateTextFields, UploadFieldKey } from "@/lib/types";
 
 type FilesState = Record<UploadFieldKey, File | null>;
 
@@ -20,14 +20,11 @@ const EMPTY_FILES: FilesState = {
   doodleImage: null,
 };
 
-const POLL_INTERVAL = 1200;
-const POLL_TIMEOUT = 90_000;
-
 export default function Home() {
   const [files, setFiles] = React.useState<FilesState>(EMPTY_FILES);
   const [fields, setFields] = React.useState<GenerateTextFields>(DEFAULT_TEXT_FIELDS);
   const [generating, setGenerating] = React.useState(false);
-  const [result, setResult] = React.useState<TaskResult | null>(null);
+  const [images, setImages] = React.useState<GeneratedImage[] | null>(null);
 
   const setFile = React.useCallback((key: UploadFieldKey, file: File | null) => {
     setFiles((prev) => ({ ...prev, [key]: file }));
@@ -55,18 +52,6 @@ export default function Home() {
     return null;
   }
 
-  async function pollTask(taskId: string): Promise<TaskResult> {
-    const start = Date.now();
-    while (Date.now() - start < POLL_TIMEOUT) {
-      const res = await fetch(`/api/tasks/${taskId}`, { cache: "no-store" });
-      const data = (await res.json()) as TaskResult;
-      if (data.status === "success") return data;
-      if (data.status === "failed") throw new Error(data.error || "生成失败，请稍后重试。");
-      await new Promise((r) => setTimeout(r, POLL_INTERVAL));
-    }
-    throw new Error("生成超时，请稍后重试。");
-  }
-
   async function onGenerate() {
     const error = validate();
     if (error) {
@@ -74,7 +59,7 @@ export default function Home() {
       return;
     }
     setGenerating(true);
-    setResult(null);
+    setImages(null);
     try {
       const fd = new FormData();
       (Object.keys(files) as UploadFieldKey[]).forEach((k) => {
@@ -85,12 +70,11 @@ export default function Home() {
       });
 
       const res = await fetch("/api/generate", { method: "POST", body: fd });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.message || "生成提交失败。");
+      const data = (await res.json()) as GenerateResponse & { message?: string };
+      if (!res.ok || !data.images) throw new Error(data.message || "生成失败，请稍后重试。");
 
-      const final = await pollTask(data.taskId);
-      setResult(final);
-      toast.success(`已生成 ${final.images.length} 张图片。`);
+      setImages(data.images);
+      toast.success(`已生成 ${data.images.length} 张图片。`);
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "生成失败，请稍后重试。");
     } finally {
@@ -113,7 +97,7 @@ export default function Home() {
       doodleSingleText: "", doodleDoubleLine1: "", doodleDoubleLine2: "",
     });
     setFiles(EMPTY_FILES);
-    setResult(null);
+    setImages(null);
     toast.info("已清空素材与文案。");
   }
 
@@ -155,7 +139,7 @@ export default function Home() {
 
         {/* 右侧结果区：独立滚动 */}
         <main className="p-4 sm:p-6 lg:h-full lg:min-h-0 lg:overflow-y-auto">
-          <ResultGrid mode={fields.doodleMode} generating={generating} result={result} />
+          <ResultGrid mode={fields.doodleMode} generating={generating} images={images} />
         </main>
       </div>
     </div>

@@ -14,6 +14,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
+import { downloadJpg, downloadPng, pngDataUrl } from "@/lib/client/download";
 import type { GeneratedImage } from "@/lib/types";
 
 interface Props {
@@ -23,23 +24,23 @@ interface Props {
   loading: boolean;
 }
 
-function download(url: string) {
-  const a = document.createElement("a");
-  a.href = url;
-  a.rel = "noopener";
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-}
-
 export function ResultCard({ spec, image, loading }: Props) {
-  function handleDownload(format: "png" | "jpg") {
+  const src = image ? pngDataUrl(image) : undefined;
+
+  async function handleDownload(format: "png" | "jpg") {
     if (!image) return;
-    if (spec.isDoodle && format === "jpg") {
+    if (format === "png") {
+      downloadPng(image);
+      return;
+    }
+    if (spec.isDoodle) {
       toast.warning("JPG 不支持透明背景，Doodle 的透明区域将被填充为白色。");
     }
-    const url = image.pngUrl.replace(/format=png/, `format=${format}`);
-    download(url);
+    try {
+      await downloadJpg(image);
+    } catch {
+      toast.error("JPG 转换失败，请重试。");
+    }
   }
 
   return (
@@ -63,7 +64,7 @@ export function ResultCard({ spec, image, loading }: Props) {
                 <button className="group relative h-full w-full">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src={image.pngUrl}
+                    src={src}
                     alt={spec.name}
                     className="h-full w-full object-contain"
                   />
@@ -78,7 +79,7 @@ export function ResultCard({ spec, image, loading }: Props) {
                 </DialogHeader>
                 <div className={cn("flex justify-center rounded-md", spec.isDoodle && "checkerboard")}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={image.pngUrl} alt={spec.name} className="max-h-[70vh] object-contain" />
+                  <img src={src} alt={spec.name} className="max-h-[70vh] object-contain" />
                 </div>
               </DialogContent>
             </Dialog>

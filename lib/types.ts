@@ -51,25 +51,24 @@ export type UploadFieldKey =
   | "logoImage"
   | "doodleImage";
 
-export type TaskStatus = "pending" | "running" | "success" | "failed";
-
 export interface GeneratedImage {
   id: string; // 稳定标识，如 marketing_750x750_1 / doodle_single
-  name: string; // 展示名，如 "750×750"
+  name: string; // 统一展示名，如 "750×750 方图"
   width: number;
   height: number;
   isDoodle: boolean;
   hasAlpha: boolean; // 是否带透明通道（Doodle = true）
-  /** 后端代理下载地址（PNG 原图）；前端永远只接触本项目地址 */
-  pngUrl: string;
+  /**
+   * PNG 原图的 base64（不含 data: 前缀）。
+   * 直接随生成响应内联返回，前端用 data URL 预览与下载，
+   * 不依赖任何服务端会话状态 —— 在 Vercel 多实例 Serverless 下也始终可用。
+   */
+  pngBase64: string;
 }
 
-export interface TaskResult {
-  taskId: string;
-  status: TaskStatus;
+/** POST /api/generate 的同步响应 */
+export interface GenerateResponse {
   images: GeneratedImage[];
-  error?: string;
-  createdAt: number;
 }
 
 /** OneThingAI 适配器从工作流执行后返回的单张原始图片 */

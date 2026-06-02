@@ -5,7 +5,10 @@
  * 接入真实 OneThingAI 时只需新增一个实现并在 client.ts 切换，前端与 API 路由无需改动。
  */
 import type { OutputSpec } from "./node-map";
-import type { ProviderImage, TaskStatus, UploadFieldKey } from "@/lib/types";
+import type { ProviderImage, UploadFieldKey } from "@/lib/types";
+
+/** 适配器任务状态 */
+export type ProviderStatus = "pending" | "running" | "success" | "failed";
 
 export interface SubmitContext {
   /** 本次需要产出的输出位（含尺寸 / 是否 Doodle / 是否透明） */
@@ -14,7 +17,7 @@ export interface SubmitContext {
 }
 
 export interface PollResult {
-  status: TaskStatus;
+  status: ProviderStatus;
   /** 成功时返回原始 PNG 图片 */
   images?: ProviderImage[];
   error?: string;

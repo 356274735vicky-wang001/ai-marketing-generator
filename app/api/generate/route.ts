@@ -3,11 +3,12 @@ import { getProvider } from "@/lib/onething/client";
 import { buildWorkflow, type UploadedRefs } from "@/lib/onething/workflow-builder";
 import { outputsForMode } from "@/lib/onething/node-map";
 import { textFieldsSchema, MAX_UPLOAD_BYTES, ACCEPTED_IMAGE_TYPES } from "@/lib/form-schema";
-import { createTask } from "@/lib/task-store";
-import type { GenerateTextFields, UploadFieldKey } from "@/lib/types";
+import type { GenerateResponse, GeneratedImage, UploadFieldKey } from "@/lib/types";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
+// 生成可能较慢（真实 OneThingAI），放宽函数时长上限
+export const maxDuration = 60;
 
 const REQUIRED_UPLOADS: { field: UploadFieldKey; label: string }[] = [
   { field: "backgroundImage", label: "背景图" },
@@ -55,7 +56,7 @@ export async function POST(req: NextRequest) {
     const first = parsed.error.errors[0];
     return err(`字段「${first.path.join(".")}」无效：${first.message}`);
   }
-  const fields = parsed.data as GenerateTextFields;
+  const fields = parsed.data;
 
   try {
     const provider = getProvider();
@@ -72,26 +73,46 @@ export async function POST(req: NextRequest) {
     const { workflow, warnings } = buildWorkflow(refs, fields);
     if (warnings.length) console.warn("[generate] workflow warnings:", warnings);
 
-    // 5) 提交运行
+    // 5) 同步提交运行并取结果（无跨实例会话状态）
     const outputs = outputsForMode(fields.doodleMode);
     const ctx = { outputs, doodleMode: fields.doodleMode };
     const providerTaskId = await provider.submit(workflow, ctx);
+    const poll = await provider.poll(providerTaskId, ctx);
 
-    // 6) 落库任务
-    const taskId = `task_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
-    createTask({
-      taskId,
-      providerTaskId,
-      status: "running",
-      doodleMode: fields.doodleMode,
-      outputs,
-      images: new Map(),
-      createdAt: Date.now(),
-    });
+    if (poll.status === "failed" || !poll.images) {
+      return NextResponse.json(
+        { error: "generate_failed", message: poll.error ?? "生成失败，请稍后重试。" },
+        { status: 502 }
+      );
+    }
 
-    return NextResponse.json({ taskId, status: "running" });
+    // 6) 内联返回 base64 图片（前端用 data URL 预览/下载，不依赖服务端状态）
+    const specById = new Map(outputs.map((s) => [s.id, s]));
+    const images: GeneratedImage[] = [];
+    for (const img of poll.images) {
+      const spec = specById.get(img.id);
+      if (!spec) continue;
+      images.push({
+        id: spec.id,
+        name: spec.name,
+        width: spec.width,
+        height: spec.height,
+        isDoodle: spec.isDoodle,
+        hasAlpha: spec.hasAlpha,
+        pngBase64: img.buffer.toString("base64"),
+      });
+    }
+
+    if (images.length === 0) {
+      return NextResponse.json(
+        { error: "empty_result", message: "生成结果为空，请稍后重试。" },
+        { status: 502 }
+      );
+    }
+
+    return NextResponse.json({ images } satisfies GenerateResponse);
   } catch (e) {
-    const message = e instanceof Error ? e.message : "生成提交失败，请稍后重试。";
+    const message = e instanceof Error ? e.message : "生成失败，请稍后重试。";
     console.error("[generate] error:", e);
     return NextResponse.json({ error: "generate_failed", message }, { status: 502 });
   }
