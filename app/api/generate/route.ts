@@ -75,7 +75,17 @@ export async function POST(req: NextRequest) {
 
     // 5) 同步提交运行并取结果（无跨实例会话状态）
     const outputs = outputsForMode(fields.doodleMode);
-    const ctx = { outputs, doodleMode: fields.doodleMode };
+    // 预览样例文案（Mock 用于在占位图上渲染真实中文；真实适配器忽略）
+    const labels: Record<string, string> = {
+      marketing_750x750_1: fields.copy750Square,
+      marketing_530x706: fields.copy530x706,
+      marketing_750x400: fields.copy750x400,
+      marketing_750x750_2: "",
+      marketing_342x514: fields.title342x514,
+      doodle_single: fields.doodleSingleText,
+      doodle_double: `${fields.doodleDoubleLine1} ${fields.doodleDoubleLine2}`,
+    };
+    const ctx = { outputs, doodleMode: fields.doodleMode, labels };
     const providerTaskId = await provider.submit(workflow, ctx);
     const poll = await provider.poll(providerTaskId, ctx);
 

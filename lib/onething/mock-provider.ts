@@ -1,68 +1,117 @@
 /**
- * Mock 适配器：不调用任何外部服务，本地直接用 sharp 合成占位图。
- * 用于在拿到真实 OneThingAI API 规格前跑通全链路（上传→生成→预览→下载→ZIP）。
+ * Mock 适配器：不调用任何外部服务，用 @napi-rs/canvas 合成占位图。
+ * 中文文字用项目内打包的 Noto Sans SC 字体渲染（显式 registerFont），
+ * 不依赖系统字体，确保在 Vercel Linux 环境也不会出现方块/乱码。
  */
-import sharp from "sharp";
+import path from "node:path";
+import fs from "node:fs";
+import { createCanvas, GlobalFonts, type SKRSContext2D } from "@napi-rs/canvas";
 import type { OneThingProvider, PollResult, SubmitContext } from "./provider";
 import type { OutputSpec } from "./node-map";
 import type { ProviderImage } from "@/lib/types";
 
-const PALETTE = ["#2563EB", "#7C3AED", "#0EA5E9", "#10B981", "#F59E0B"];
+const FONT_FAMILY = "Noto Sans SC";
 
-function escapeXml(s: string): string {
-  return s.replace(/[<>&'"]/g, (c) =>
-    ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", "'": "&apos;", '"': "&quot;" }[c]!)
-  );
+// 进程内只注册一次。用 process.cwd() 拼绝对路径，兼容本地与 Vercel。
+let fontReady = false;
+function ensureFont() {
+  if (fontReady) return;
+  const fontPath = path.join(process.cwd(), "assets", "fonts", "NotoSansSC-Regular.otf");
+  if (fs.existsSync(fontPath)) {
+    GlobalFonts.registerFromPath(fontPath, FONT_FAMILY);
+  } else {
+    console.warn("[mock] 中文字体缺失:", fontPath);
+  }
+  fontReady = true;
 }
 
-/** 生成一张营销占位图（不透明） */
-async function renderMarketing(spec: OutputSpec, i: number): Promise<Buffer> {
+const PALETTE = ["#2563EB", "#7C3AED", "#0EA5E9", "#10B981", "#F59E0B"];
+
+/** 居中绘制多行文字 */
+function drawCenteredLines(
+  ctx: SKRSContext2D,
+  lines: string[],
+  cx: number,
+  startY: number,
+  lineHeight: number
+) {
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  lines.forEach((line, i) => {
+    if (line) ctx.fillText(line, cx, startY + i * lineHeight);
+  });
+}
+
+/** 营销占位图（不透明），叠加尺寸名 + 用户中文样例文案 */
+function renderMarketing(spec: OutputSpec, i: number, label: string): Buffer {
   const { width, height } = spec;
-  const bg = PALETTE[i % PALETTE.length];
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${width}" height="${height}">
-    <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="${bg}"/><stop offset="100%" stop-color="#0f172a"/>
-    </linearGradient></defs>
-    <rect width="100%" height="100%" fill="url(#g)"/>
-    <rect x="8" y="8" width="${width - 16}" height="${height - 16}" fill="none" stroke="#ffffff" stroke-opacity="0.4" stroke-width="2" rx="12"/>
-    <text x="50%" y="46%" fill="#ffffff" font-size="${Math.round(Math.min(width, height) / 9)}" font-family="sans-serif" font-weight="700" text-anchor="middle">MOCK</text>
-    <text x="50%" y="60%" fill="#ffffff" font-size="${Math.round(Math.min(width, height) / 14)}" font-family="sans-serif" text-anchor="middle">${escapeXml(spec.name)}</text>
-  </svg>`;
-  return sharp(Buffer.from(svg)).png().toBuffer();
+  const canvas = createCanvas(width, height);
+  const ctx = canvas.getContext("2d");
+
+  const grad = ctx.createLinearGradient(0, 0, width, height);
+  grad.addColorStop(0, PALETTE[i % PALETTE.length]);
+  grad.addColorStop(1, "#0f172a");
+  ctx.fillStyle = grad;
+  ctx.fillRect(0, 0, width, height);
+
+  ctx.strokeStyle = "rgba(255,255,255,0.4)";
+  ctx.lineWidth = 2;
+  ctx.strokeRect(8, 8, width - 16, height - 16);
+
+  const base = Math.min(width, height);
+  ctx.fillStyle = "#ffffff";
+
+  // 顶部：MOCK + 尺寸名（中文）
+  ctx.font = `700 ${Math.round(base / 10)}px "${FONT_FAMILY}"`;
+  drawCenteredLines(ctx, ["MOCK"], width / 2, height * 0.26, 0);
+  ctx.font = `500 ${Math.round(base / 16)}px "${FONT_FAMILY}"`;
+  drawCenteredLines(ctx, [spec.name], width / 2, height * 0.4, 0);
+
+  // 中部：用户输入的中文主文案（验证中文渲染）
+  if (label.trim()) {
+    const lines = label.split("\n");
+    const fs2 = Math.round(base / 11);
+    ctx.font = `700 ${fs2}px "${FONT_FAMILY}"`;
+    drawCenteredLines(ctx, lines, width / 2, height * 0.62, fs2 * 1.3);
+  }
+
+  return canvas.toBuffer("image/png");
 }
 
 /**
- * 生成 Doodle 占位图：162×162，主体 158×158，四边 2px 透明边距，背景透明。
- * 符合 PRD 第 8 节规范。
+ * Doodle 占位图：162×162，主体 158×158，四边 2px 透明边距，背景透明。
  */
-async function renderDoodle(spec: OutputSpec, mode: "single" | "double"): Promise<Buffer> {
+function renderDoodle(spec: OutputSpec, mode: "single" | "double", label: string): Buffer {
   const subject = 158;
   const pad = 2;
-  const label = mode === "single" ? "单行" : "双行";
-  const subjectSvg = `<svg xmlns="http://www.w3.org/2000/svg" width="${subject}" height="${subject}">
-    <circle cx="${subject / 2}" cy="${subject / 2}" r="${subject / 2 - 6}" fill="#2563EB" fill-opacity="0.9"/>
-    <text x="50%" y="44%" fill="#ffffff" font-size="20" font-family="sans-serif" font-weight="700" text-anchor="middle">Doodle</text>
-    <text x="50%" y="62%" fill="#ffffff" font-size="16" font-family="sans-serif" text-anchor="middle">${label}</text>
-  </svg>`;
-  const subjectPng = await sharp(Buffer.from(subjectSvg)).png().toBuffer();
-  // 四边补 2px 透明边距 → 162×162，保留 alpha
-  return sharp(subjectPng)
-    .extend({
-      top: pad,
-      bottom: pad,
-      left: pad,
-      right: pad,
-      background: { r: 0, g: 0, b: 0, alpha: 0 },
-    })
-    .png()
-    .toBuffer();
+  const total = subject + pad * 2; // 162
+
+  const canvas = createCanvas(total, total); // 默认透明背景
+  const ctx = canvas.getContext("2d");
+
+  // 主体圆（绘制在 2px 内边距内）
+  const cx = total / 2;
+  const cy = total / 2;
+  ctx.beginPath();
+  ctx.arc(cx, cy, subject / 2 - 6, 0, Math.PI * 2);
+  ctx.fillStyle = "rgba(37,99,235,0.92)";
+  ctx.fill();
+
+  ctx.fillStyle = "#ffffff";
+  ctx.font = `700 20px "${FONT_FAMILY}"`;
+  drawCenteredLines(ctx, ["Doodle"], cx, cy - 18, 0);
+  // 用户输入的 Doodle 中文（限制长度避免溢出）
+  const text = (label.trim() || (mode === "single" ? "单行" : "双行")).slice(0, 6);
+  ctx.font = `500 16px "${FONT_FAMILY}"`;
+  drawCenteredLines(ctx, [text], cx, cy + 14, 0);
+
+  return canvas.toBuffer("image/png");
 }
 
 export class MockProvider implements OneThingProvider {
   readonly name = "mock";
 
-  async uploadImage(buffer: Buffer, filename: string): Promise<string> {
-    // Mock 不真正上传，返回带时间戳的文件名占位
+  async uploadImage(_buffer: Buffer, filename: string): Promise<string> {
     return `mock_${Date.now()}_${filename}`;
   }
 
@@ -71,13 +120,15 @@ export class MockProvider implements OneThingProvider {
   }
 
   async poll(_providerTaskId: string, ctx: SubmitContext): Promise<PollResult> {
-    // Mock 直接同步出图（真实场景会经历 pending/running）
+    ensureFont();
+    const labels = ctx.labels ?? {};
     const images: ProviderImage[] = [];
     let i = 0;
     for (const spec of ctx.outputs) {
+      const label = labels[spec.id] ?? "";
       const buffer = spec.isDoodle
-        ? await renderDoodle(spec, ctx.doodleMode)
-        : await renderMarketing(spec, i++);
+        ? renderDoodle(spec, ctx.doodleMode, label)
+        : renderMarketing(spec, i++, label);
       images.push({ id: spec.id, buffer });
     }
     return { status: "success", images };

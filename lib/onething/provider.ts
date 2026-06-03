@@ -14,6 +14,11 @@ export interface SubmitContext {
   /** 本次需要产出的输出位（含尺寸 / 是否 Doodle / 是否透明） */
   outputs: OutputSpec[];
   doodleMode: "single" | "double";
+  /**
+   * 各输出图要展示的中文样例文案，键为输出 id。
+   * Mock 适配器用它在占位图上渲染真实中文，便于验证字体；真实适配器忽略。
+   */
+  labels?: Record<string, string>;
 }
 
 export interface PollResult {
