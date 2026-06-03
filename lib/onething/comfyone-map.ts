@@ -1,12 +1,8 @@
 /**
  * ComfyOne 输入/输出映射（真实调用专用）。
  *
- * ⚠️ 待核对（需要 ComfyUI「API 格式」导出的工作流 JSON 才能定稿）：
- *   ComfyOne 的 inputs[].params 的键名 = 各节点在 API 格式里的真实 input 字段名。
- *   下面的 PARAM_KEYS 与 OUTPUT_NODES 是依据现有编辑器格式 JSON 的「最佳推断」，
- *   拿到 API 格式 JSON 后只需在本文件订正这两处即可，其余调用逻辑无需改动。
- *
- * 节点 ID 来源：lib/onething/node-map.ts（已与编辑器格式 JSON 核对）。
+ * 字段名与输出节点 ID 已根据 workflow/一键换图生图_API.json（ComfyUI API 格式）核对确认。
+ * 节点 ID 来源：lib/onething/node-map.ts（与编辑器格式一致）。
  */
 import {
   IMAGE_BINDINGS,
@@ -18,38 +14,33 @@ import { normalizeHexForComfy } from "./hex";
 import type { GenerateTextFields, UploadFieldKey } from "@/lib/types";
 import type { ComfyOnePromptInput } from "./comfyone";
 
-/** ⚠️ 待核对：各节点类型在 API 格式里的 input 字段名 */
+/** 各节点类型在 API 格式里的真实 input 字段名（已核对）。 */
 export const PARAM_KEYS = {
-  loadImage: "image", // LoadImage 的图片输入
+  loadImage: "image", // LoadImage 图片
   crText: "text", // CR Text 文本
   overlayText: "text", // CR Overlay Text 文本
-  overlayColor: "font_color", // CR Overlay Text 文字颜色（待核对）
-  panelColor: "panel_color", // CR Color Panel 颜色（待核对）
+  overlayColor: "font_color_hex", // CR Overlay Text 文字颜色（hex，不带 #）
+  panelColor: "fill_color_hex", // CR Color Panel 颜色（hex，不带 #）
 } as const;
 
-/** ⚠️ 待核对：每张图最终输出节点 ID（应为分支末端 Save/PreviewImage） */
-export const MARKETING_OUTPUT_NODES: { ourId: string; nodeId: string }[] = [
-  { ourId: "marketing_750x750_1", nodeId: "24" },
-  { ourId: "marketing_530x706", nodeId: "54" },
-  { ourId: "marketing_750x400", nodeId: "68" },
-  { ourId: "marketing_750x750_2", nodeId: "80" },
-  { ourId: "marketing_342x514", nodeId: "107" },
+/**
+ * 注册工作流时声明的 outputs 顺序（固定）。
+ * 真实任务返回的 images[] 严格按此顺序回填。包含两个 Doodle 输出，
+ * 上层再按当前模式只保留对应那一张。
+ */
+export const REGISTERED_OUTPUTS: { ourId: string; nodeId: string }[] = [
+  { ourId: "marketing_750x750_1", nodeId: "24" }, // 750×750 方图（终端 Image Overlay #22）
+  { ourId: "marketing_530x706", nodeId: "54" }, // 530×706 竖图（终端 #52）
+  { ourId: "marketing_750x400", nodeId: "68" }, // 750×400 横版（终端 #69）
+  { ourId: "marketing_750x750_2", nodeId: "80" }, // 二楼图（终端 Image Overlay #79）
+  { ourId: "marketing_342x514", nodeId: "107" }, // 342×514 轮播图（终端 #104）
+  { ourId: "doodle_single", nodeId: "135" }, // Doodle 单行 SaveImage
+  { ourId: "doodle_double", nodeId: "121" }, // Doodle 双行 SaveImage
 ];
-export const DOODLE_OUTPUT_NODE = { single: "135", double: "121" } as const;
 
-/** 当前模式下，提交给 ComfyOne 的 outputs（节点 ID）+ 回填用的 ourId（顺序一致） */
-export function outputNodesForMode(mode: "single" | "double"): { ourId: string; nodeId: string }[] {
-  return [
-    ...MARKETING_OUTPUT_NODES,
-    {
-      ourId: mode === "single" ? "doodle_single" : "doodle_double",
-      nodeId: DOODLE_OUTPUT_NODE[mode],
-    },
-  ];
-}
-
-function withHash(hex: string): string {
-  return `#${normalizeHexForComfy(hex)}`;
+/** ComfyUI 颜色字段用不带 # 的 hex（与工作流默认值一致，如 "003074"/"FFE648"）。 */
+function hex(v: string): string {
+  return normalizeHexForComfy(v, false);
 }
 
 /**
@@ -87,18 +78,18 @@ export function buildPromptInputs(
     const v = fields[b.field];
     if (typeof v !== "string" || !v) continue;
     const key = b.op === "panelColor" ? PARAM_KEYS.panelColor : PARAM_KEYS.overlayColor;
-    put(b.nodeId, key, withHash(v));
+    put(b.nodeId, key, hex(v));
   }
 
   // Doodle（按模式只改对应节点）
   if (mode === "single") {
     put(DOODLE_NODES.singleTextNode, PARAM_KEYS.overlayText, fields.doodleSingleText);
     if (fields.doodleTextColor)
-      put(DOODLE_NODES.singleTextNode, PARAM_KEYS.overlayColor, withHash(fields.doodleTextColor));
+      put(DOODLE_NODES.singleTextNode, PARAM_KEYS.overlayColor, hex(fields.doodleTextColor));
   } else {
     put(DOODLE_NODES.doubleTextNode, PARAM_KEYS.overlayText, `${fields.doodleDoubleLine1}\n${fields.doodleDoubleLine2}`);
     if (fields.doodleTextColor)
-      put(DOODLE_NODES.doubleTextNode, PARAM_KEYS.overlayColor, withHash(fields.doodleTextColor));
+      put(DOODLE_NODES.doubleTextNode, PARAM_KEYS.overlayColor, hex(fields.doodleTextColor));
   }
 
   return [...byNode.entries()].map(([id, params]) => ({ id, params }));

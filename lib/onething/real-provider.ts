@@ -12,7 +12,7 @@
  * ⚠️ 节点→params 字段名、输出节点 ID 待用 API 格式工作流核对（见 comfyone-map.ts）。
  */
 import * as comfyone from "./comfyone";
-import { buildPromptInputs, outputNodesForMode } from "./comfyone-map";
+import { buildPromptInputs, REGISTERED_OUTPUTS } from "./comfyone-map";
 import type { OneThingProvider, PollResult, SubmitContext } from "./provider";
 import type { ProviderImage, UploadFieldKey } from "@/lib/types";
 
@@ -62,13 +62,13 @@ export class RealOneThingProvider implements OneThingProvider {
       return { status: "running" }; // pendding / pending / running
     }
 
-    // finished：按 outputs 顺序把图片 URL 映射回我们的输出 id，并下载为二进制
-    const order = outputNodesForMode(ctx.doodleMode);
+    // finished：images[] 按注册的 outputs 顺序回填到我们的输出 id，并下载为二进制。
+    // 返回全部（含两个 Doodle），由上层按当前模式只保留对应那张。
     const urls = r.images ?? [];
     const images: ProviderImage[] = [];
-    for (let i = 0; i < order.length && i < urls.length; i++) {
+    for (let i = 0; i < REGISTERED_OUTPUTS.length && i < urls.length; i++) {
       const buffer = await comfyone.fetchImage(urls[i]);
-      images.push({ id: order[i].ourId, buffer });
+      images.push({ id: REGISTERED_OUTPUTS[i].ourId, buffer });
     }
     if (images.length === 0) {
       return { status: "failed", error: "OneThingAI 返回结果为空" };

@@ -1,0 +1,1444 @@
+{
+  "12": {
+    "inputs": {
+      "image": "元素750.png"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "加载图像"
+    }
+  },
+  "15": {
+    "inputs": {
+      "image": "背景渐变 (2).png"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "加载图像"
+    }
+  },
+  "17": {
+    "inputs": {
+      "overlay_resize": "None",
+      "resize_method": "nearest-exact",
+      "rescale_factor": 1,
+      "width": 512,
+      "height": 512,
+      "x_offset": 0,
+      "y_offset": 310,
+      "rotation": 0,
+      "opacity": 0,
+      "base_image": [
+        "15",
+        0
+      ],
+      "overlay_image": [
+        "12",
+        0
+      ],
+      "optional_mask": [
+        "12",
+        1
+      ]
+    },
+    "class_type": "Image Overlay",
+    "_meta": {
+      "title": "图像覆盖"
+    }
+  },
+  "18": {
+    "inputs": {
+      "images": [
+        "19",
+        0
+      ]
+    },
+    "class_type": "PreviewImage",
+    "_meta": {
+      "title": "预览图像"
+    }
+  },
+  "19": {
+    "inputs": {
+      "text": "出行抽一抽\n领假日券包",
+      "font_name": "造字工房元黑体 2(1).ttf",
+      "font_size": 74,
+      "font_color": "custom",
+      "align": "top",
+      "justify": "center",
+      "margins": 0,
+      "line_spacing": 6,
+      "position_x": 0,
+      "position_y": 160,
+      "rotation_angle": 0,
+      "rotation_options": "text center",
+      "font_color_hex": "003074",
+      "image": [
+        "17",
+        0
+      ]
+    },
+    "class_type": "CR Overlay Text",
+    "_meta": {
+      "title": "文字覆盖"
+    }
+  },
+  "21": {
+    "inputs": {
+      "images": [
+        "17",
+        0
+      ]
+    },
+    "class_type": "PreviewImage",
+    "_meta": {
+      "title": "预览图像"
+    }
+  },
+  "22": {
+    "inputs": {
+      "overlay_resize": "None",
+      "resize_method": "nearest-exact",
+      "rescale_factor": 1,
+      "width": 512,
+      "height": 512,
+      "x_offset": 299,
+      "y_offset": 90,
+      "rotation": 0,
+      "opacity": 0,
+      "base_image": [
+        "19",
+        0
+      ],
+      "overlay_image": [
+        "23",
+        0
+      ],
+      "optional_mask": [
+        "23",
+        1
+      ]
+    },
+    "class_type": "Image Overlay",
+    "_meta": {
+      "title": "图像覆盖"
+    }
+  },
+  "23": {
+    "inputs": {
+      "image": "logo (4).png"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "加载图像"
+    }
+  },
+  "24": {
+    "inputs": {
+      "images": [
+        "22",
+        0
+      ]
+    },
+    "class_type": "PreviewImage",
+    "_meta": {
+      "title": "预览图像"
+    }
+  },
+  "28": {
+    "inputs": {
+      "aspect_ratio": "custom",
+      "proportional_width": 530,
+      "proportional_height": 706,
+      "fit": "fill",
+      "method": "lanczos",
+      "round_to_multiple": "None",
+      "scale_to_side": "height",
+      "scale_to_length": 706,
+      "background_color": "#000000",
+      "image": [
+        "15",
+        0
+      ]
+    },
+    "class_type": "LayerUtility: ImageScaleByAspectRatio V2",
+    "_meta": {
+      "title": "图层工具：按宽高比缩放 V2"
+    }
+  },
+  "36": {
+    "inputs": {
+      "aspect_ratio": "original",
+      "proportional_width": 1,
+      "proportional_height": 1,
+      "fit": "fill",
+      "method": "lanczos",
+      "round_to_multiple": "None",
+      "scale_to_side": "shortest",
+      "scale_to_length": 308,
+      "background_color": "000000",
+      "image": [
+        "12",
+        0
+      ],
+      "mask": [
+        "12",
+        1
+      ]
+    },
+    "class_type": "LayerUtility: ImageScaleByAspectRatio V2",
+    "_meta": {
+      "title": "图层工具：按宽高比缩放 V2"
+    }
+  },
+  "37": {
+    "inputs": {
+      "images": [
+        "36",
+        0
+      ]
+    },
+    "class_type": "PreviewImage",
+    "_meta": {
+      "title": "预览图像"
+    }
+  },
+  "39": {
+    "inputs": {
+      "images": [
+        "28",
+        0
+      ]
+    },
+    "class_type": "PreviewImage",
+    "_meta": {
+      "title": "预览图像"
+    }
+  },
+  "40": {
+    "inputs": {
+      "overlay_resize": "None",
+      "resize_method": "nearest-exact",
+      "rescale_factor": 1,
+      "width": 512,
+      "height": 512,
+      "x_offset": -30,
+      "y_offset": 280,
+      "rotation": 0,
+      "opacity": 0,
+      "base_image": [
+        "28",
+        0
+      ],
+      "overlay_image": [
+        "36",
+        0
+      ],
+      "optional_mask": [
+        "36",
+        1
+      ]
+    },
+    "class_type": "Image Overlay",
+    "_meta": {
+      "title": "图像覆盖"
+    }
+  },
+  "41": {
+    "inputs": {
+      "images": [
+        "40",
+        0
+      ]
+    },
+    "class_type": "PreviewImage",
+    "_meta": {
+      "title": "预览图像"
+    }
+  },
+  "42": {
+    "inputs": {
+      "text": "出行抽一抽\n领假日券包",
+      "font_name": "造字工房元黑体 2(1).ttf",
+      "font_size": 66,
+      "font_color": "custom",
+      "align": "top",
+      "justify": "center",
+      "margins": 0,
+      "line_spacing": 6,
+      "position_x": 0,
+      "position_y": 90,
+      "rotation_angle": 0,
+      "rotation_options": "text center",
+      "font_color_hex": "003074",
+      "image": [
+        "40",
+        0
+      ]
+    },
+    "class_type": "CR Overlay Text",
+    "_meta": {
+      "title": "文字覆盖"
+    }
+  },
+  "44": {
+    "inputs": {
+      "overlay_resize": "None",
+      "resize_method": "nearest-exact",
+      "rescale_factor": 1,
+      "width": 512,
+      "height": 512,
+      "x_offset": 189,
+      "y_offset": 36,
+      "rotation": 0,
+      "opacity": 0,
+      "base_image": [
+        "42",
+        0
+      ],
+      "overlay_image": [
+        "23",
+        0
+      ],
+      "optional_mask": [
+        "23",
+        1
+      ]
+    },
+    "class_type": "Image Overlay",
+    "_meta": {
+      "title": "图像覆盖"
+    }
+  },
+  "45": {
+    "inputs": {
+      "images": [
+        "44",
+        0
+      ]
+    },
+    "class_type": "PreviewImage",
+    "_meta": {
+      "title": "预览图像"
+    }
+  },
+  "46": {
+    "inputs": {
+      "images": [
+        "42",
+        0
+      ]
+    },
+    "class_type": "PreviewImage",
+    "_meta": {
+      "title": "预览图像"
+    }
+  },
+  "47": {
+    "inputs": {
+      "rounded_rect_radius": 100,
+      "anti_aliasing": 2,
+      "top": 0,
+      "bottom": 0,
+      "left": 0,
+      "right": 0,
+      "detect": "mask_area",
+      "obj_ext_top": 0,
+      "obj_ext_bottom": 0,
+      "obj_ext_left": 0,
+      "obj_ext_right": 0,
+      "image": [
+        "48",
+        0
+      ]
+    },
+    "class_type": "LayerUtility: RoundedRectangle",
+    "_meta": {
+      "title": "图层工具：圆角矩形"
+    }
+  },
+  "48": {
+    "inputs": {
+      "panel_width": 300,
+      "panel_height": 60,
+      "fill_color": "custom",
+      "fill_color_hex": "FFE648"
+    },
+    "class_type": "CR Color Panel",
+    "_meta": {
+      "title": "颜色面板"
+    }
+  },
+  "49": {
+    "inputs": {
+      "overlay_resize": "None",
+      "resize_method": "nearest-exact",
+      "rescale_factor": 1,
+      "width": 512,
+      "height": 512,
+      "x_offset": 115,
+      "y_offset": 600,
+      "rotation": 0,
+      "opacity": 0,
+      "base_image": [
+        "44",
+        0
+      ],
+      "overlay_image": [
+        "47",
+        0
+      ],
+      "optional_mask": [
+        "50",
+        0
+      ]
+    },
+    "class_type": "Image Overlay",
+    "_meta": {
+      "title": "图像覆盖"
+    }
+  },
+  "50": {
+    "inputs": {
+      "mask": [
+        "47",
+        1
+      ]
+    },
+    "class_type": "InvertMask",
+    "_meta": {
+      "title": "反转遮罩"
+    }
+  },
+  "51": {
+    "inputs": {
+      "images": [
+        "49",
+        0
+      ]
+    },
+    "class_type": "PreviewImage",
+    "_meta": {
+      "title": "预览图像"
+    }
+  },
+  "52": {
+    "inputs": {
+      "text": [
+        "53",
+        0
+      ],
+      "font_name": "PingFang-SC-Medium.ttf",
+      "font_size": 32,
+      "font_color": "custom",
+      "align": "top",
+      "justify": "center",
+      "margins": 0,
+      "line_spacing": 0,
+      "position_x": 0,
+      "position_y": 607,
+      "rotation_angle": 0,
+      "rotation_options": "text center",
+      "font_color_hex": "003074",
+      "image": [
+        "49",
+        0
+      ]
+    },
+    "class_type": "CR Overlay Text",
+    "_meta": {
+      "title": "文字覆盖"
+    }
+  },
+  "53": {
+    "inputs": {
+      "text": "立即查看"
+    },
+    "class_type": "CR Text",
+    "_meta": {
+      "title": "文本"
+    }
+  },
+  "54": {
+    "inputs": {
+      "images": [
+        "52",
+        0
+      ]
+    },
+    "class_type": "PreviewImage",
+    "_meta": {
+      "title": "预览图像"
+    }
+  },
+  "55": {
+    "inputs": {
+      "aspect_ratio": "custom",
+      "proportional_width": 750,
+      "proportional_height": 400,
+      "fit": "fill",
+      "method": "lanczos",
+      "round_to_multiple": "None",
+      "scale_to_side": "height",
+      "scale_to_length": 400,
+      "background_color": "#000000",
+      "image": [
+        "15",
+        0
+      ]
+    },
+    "class_type": "LayerUtility: ImageScaleByAspectRatio V2",
+    "_meta": {
+      "title": "图层工具：按宽高比缩放 V2"
+    }
+  },
+  "56": {
+    "inputs": {
+      "images": [
+        "55",
+        0
+      ]
+    },
+    "class_type": "PreviewImage",
+    "_meta": {
+      "title": "预览图像"
+    }
+  },
+  "57": {
+    "inputs": {
+      "aspect_ratio": "original",
+      "proportional_width": 1,
+      "proportional_height": 1,
+      "fit": "fill",
+      "method": "lanczos",
+      "round_to_multiple": "None",
+      "scale_to_side": "shortest",
+      "scale_to_length": 300,
+      "background_color": "000000",
+      "image": [
+        "12",
+        0
+      ],
+      "mask": [
+        "12",
+        1
+      ]
+    },
+    "class_type": "LayerUtility: ImageScaleByAspectRatio V2",
+    "_meta": {
+      "title": "图层工具：按宽高比缩放 V2"
+    }
+  },
+  "58": {
+    "inputs": {
+      "images": [
+        "57",
+        0
+      ]
+    },
+    "class_type": "PreviewImage",
+    "_meta": {
+      "title": "预览图像"
+    }
+  },
+  "59": {
+    "inputs": {
+      "images": [
+        "60",
+        0
+      ]
+    },
+    "class_type": "PreviewImage",
+    "_meta": {
+      "title": "预览图像"
+    }
+  },
+  "60": {
+    "inputs": {
+      "overlay_resize": "None",
+      "resize_method": "nearest-exact",
+      "rescale_factor": 1,
+      "width": 512,
+      "height": 512,
+      "x_offset": 265,
+      "y_offset": 70,
+      "rotation": 0,
+      "opacity": 0,
+      "base_image": [
+        "55",
+        0
+      ],
+      "overlay_image": [
+        "57",
+        0
+      ],
+      "optional_mask": [
+        "57",
+        1
+      ]
+    },
+    "class_type": "Image Overlay",
+    "_meta": {
+      "title": "图像覆盖"
+    }
+  },
+  "63": {
+    "inputs": {
+      "rounded_rect_radius": 100,
+      "anti_aliasing": 2,
+      "top": 0,
+      "bottom": 0,
+      "left": 0,
+      "right": 0,
+      "detect": "mask_area",
+      "obj_ext_top": 0,
+      "obj_ext_bottom": 0,
+      "obj_ext_left": 0,
+      "obj_ext_right": 0,
+      "image": [
+        "65",
+        0
+      ]
+    },
+    "class_type": "LayerUtility: RoundedRectangle",
+    "_meta": {
+      "title": "图层工具：圆角矩形"
+    }
+  },
+  "64": {
+    "inputs": {
+      "mask": [
+        "63",
+        1
+      ]
+    },
+    "class_type": "InvertMask",
+    "_meta": {
+      "title": "反转遮罩"
+    }
+  },
+  "65": {
+    "inputs": {
+      "panel_width": 210,
+      "panel_height": 60,
+      "fill_color": "custom",
+      "fill_color_hex": "FFE648"
+    },
+    "class_type": "CR Color Panel",
+    "_meta": {
+      "title": "颜色面板"
+    }
+  },
+  "66": {
+    "inputs": {
+      "text": "立即查看"
+    },
+    "class_type": "CR Text",
+    "_meta": {
+      "title": "文本"
+    }
+  },
+  "68": {
+    "inputs": {
+      "images": [
+        "69",
+        0
+      ]
+    },
+    "class_type": "PreviewImage",
+    "_meta": {
+      "title": "预览图像"
+    }
+  },
+  "69": {
+    "inputs": {
+      "text": [
+        "66",
+        0
+      ],
+      "font_name": "PingFang-SC-Medium.ttf",
+      "font_size": 40,
+      "font_color": "custom",
+      "align": "top",
+      "justify": "left",
+      "margins": 0,
+      "line_spacing": 0,
+      "position_x": 64,
+      "position_y": 280,
+      "rotation_angle": 0,
+      "rotation_options": "text center",
+      "font_color_hex": "003074",
+      "image": [
+        "71",
+        0
+      ]
+    },
+    "class_type": "CR Overlay Text",
+    "_meta": {
+      "title": "文字覆盖"
+    }
+  },
+  "71": {
+    "inputs": {
+      "overlay_resize": "None",
+      "resize_method": "nearest-exact",
+      "rescale_factor": 1,
+      "width": 512,
+      "height": 512,
+      "x_offset": 40,
+      "y_offset": 280,
+      "rotation": 0,
+      "opacity": 0,
+      "base_image": [
+        "73",
+        0
+      ],
+      "overlay_image": [
+        "63",
+        0
+      ],
+      "optional_mask": [
+        "64",
+        0
+      ]
+    },
+    "class_type": "Image Overlay",
+    "_meta": {
+      "title": "图像覆盖"
+    }
+  },
+  "72": {
+    "inputs": {
+      "images": [
+        "71",
+        0
+      ]
+    },
+    "class_type": "PreviewImage",
+    "_meta": {
+      "title": "预览图像"
+    }
+  },
+  "73": {
+    "inputs": {
+      "overlay_resize": "None",
+      "resize_method": "nearest-exact",
+      "rescale_factor": 1,
+      "width": 512,
+      "height": 512,
+      "x_offset": 40,
+      "y_offset": 70,
+      "rotation": 0,
+      "opacity": 0,
+      "base_image": [
+        "74",
+        0
+      ],
+      "overlay_image": [
+        "23",
+        0
+      ],
+      "optional_mask": [
+        "23",
+        1
+      ]
+    },
+    "class_type": "Image Overlay",
+    "_meta": {
+      "title": "图像覆盖"
+    }
+  },
+  "74": {
+    "inputs": {
+      "text": "出行抽一抽\n领假日券包",
+      "font_name": "造字工房元黑体 2(1).ttf",
+      "font_size": 58,
+      "font_color": "custom",
+      "align": "center",
+      "justify": "left",
+      "margins": 0,
+      "line_spacing": 6,
+      "position_x": 40,
+      "position_y": -10,
+      "rotation_angle": 0,
+      "rotation_options": "text center",
+      "font_color_hex": "003074",
+      "image": [
+        "60",
+        0
+      ]
+    },
+    "class_type": "CR Overlay Text",
+    "_meta": {
+      "title": "文字覆盖"
+    }
+  },
+  "77": {
+    "inputs": {
+      "images": [
+        "74",
+        0
+      ]
+    },
+    "class_type": "PreviewImage",
+    "_meta": {
+      "title": "预览图像"
+    }
+  },
+  "78": {
+    "inputs": {
+      "images": [
+        "73",
+        0
+      ]
+    },
+    "class_type": "PreviewImage",
+    "_meta": {
+      "title": "预览图像"
+    }
+  },
+  "79": {
+    "inputs": {
+      "overlay_resize": "None",
+      "resize_method": "nearest-exact",
+      "rescale_factor": 1,
+      "width": 512,
+      "height": 512,
+      "x_offset": 30,
+      "y_offset": 230,
+      "rotation": 0,
+      "opacity": 0,
+      "base_image": [
+        "15",
+        0
+      ],
+      "overlay_image": [
+        "81",
+        0
+      ],
+      "optional_mask": [
+        "81",
+        1
+      ]
+    },
+    "class_type": "Image Overlay",
+    "_meta": {
+      "title": "图像覆盖"
+    }
+  },
+  "80": {
+    "inputs": {
+      "images": [
+        "79",
+        0
+      ]
+    },
+    "class_type": "PreviewImage",
+    "_meta": {
+      "title": "预览图像"
+    }
+  },
+  "81": {
+    "inputs": {
+      "aspect_ratio": "original",
+      "proportional_width": 1,
+      "proportional_height": 1,
+      "fit": "fill",
+      "method": "lanczos",
+      "round_to_multiple": "None",
+      "scale_to_side": "shortest",
+      "scale_to_length": 345,
+      "background_color": "000000",
+      "image": [
+        "12",
+        0
+      ],
+      "mask": [
+        "12",
+        1
+      ]
+    },
+    "class_type": "LayerUtility: ImageScaleByAspectRatio V2",
+    "_meta": {
+      "title": "图层工具：按宽高比缩放 V2"
+    }
+  },
+  "83": {
+    "inputs": {
+      "images": [
+        "81",
+        0
+      ]
+    },
+    "class_type": "PreviewImage",
+    "_meta": {
+      "title": "预览图像"
+    }
+  },
+  "84": {
+    "inputs": {
+      "aspect_ratio": "custom",
+      "proportional_width": 342,
+      "proportional_height": 514,
+      "fit": "fill",
+      "method": "lanczos",
+      "round_to_multiple": "None",
+      "scale_to_side": "height",
+      "scale_to_length": 514,
+      "background_color": "#000000",
+      "image": [
+        "15",
+        0
+      ]
+    },
+    "class_type": "LayerUtility: ImageScaleByAspectRatio V2",
+    "_meta": {
+      "title": "图层工具：按宽高比缩放 V2"
+    }
+  },
+  "85": {
+    "inputs": {
+      "images": [
+        "84",
+        0
+      ]
+    },
+    "class_type": "PreviewImage",
+    "_meta": {
+      "title": "预览图像"
+    }
+  },
+  "86": {
+    "inputs": {
+      "text": "主题六个字内",
+      "font_name": "方正兰亭中粗黑_GBK.ttf",
+      "font_size": 48,
+      "font_color": "custom",
+      "align": "top",
+      "justify": "left",
+      "margins": 0,
+      "line_spacing": 0,
+      "position_x": 24,
+      "position_y": 296,
+      "rotation_angle": 0,
+      "rotation_options": "text center",
+      "font_color_hex": "ffffff",
+      "image": [
+        "84",
+        0
+      ]
+    },
+    "class_type": "CR Overlay Text",
+    "_meta": {
+      "title": "文字覆盖"
+    }
+  },
+  "87": {
+    "inputs": {
+      "images": [
+        "86",
+        0
+      ]
+    },
+    "class_type": "PreviewImage",
+    "_meta": {
+      "title": "预览图像"
+    }
+  },
+  "88": {
+    "inputs": {
+      "text": "利益点文案九个字内",
+      "font_name": "方正兰亭中粗黑_GBK.ttf",
+      "font_size": 30,
+      "font_color": "custom",
+      "align": "top",
+      "justify": "left",
+      "margins": 0,
+      "line_spacing": 0,
+      "position_x": 24,
+      "position_y": 356,
+      "rotation_angle": 0,
+      "rotation_options": "text center",
+      "font_color_hex": "ffffff",
+      "image": [
+        "86",
+        0
+      ]
+    },
+    "class_type": "CR Overlay Text",
+    "_meta": {
+      "title": "文字覆盖"
+    }
+  },
+  "89": {
+    "inputs": {
+      "images": [
+        "88",
+        0
+      ]
+    },
+    "class_type": "PreviewImage",
+    "_meta": {
+      "title": "预览图像"
+    }
+  },
+  "90": {
+    "inputs": {
+      "panel_width": 148,
+      "panel_height": 48,
+      "fill_color": "custom",
+      "fill_color_hex": "ffffff"
+    },
+    "class_type": "CR Color Panel",
+    "_meta": {
+      "title": "颜色面板"
+    }
+  },
+  "91": {
+    "inputs": {
+      "rounded_rect_radius": 100,
+      "anti_aliasing": 2,
+      "top": 0,
+      "bottom": 0,
+      "left": 0,
+      "right": 0,
+      "detect": "mask_area",
+      "obj_ext_top": 0,
+      "obj_ext_bottom": 0,
+      "obj_ext_left": 0,
+      "obj_ext_right": 0,
+      "image": [
+        "90",
+        0
+      ]
+    },
+    "class_type": "LayerUtility: RoundedRectangle",
+    "_meta": {
+      "title": "图层工具：圆角矩形"
+    }
+  },
+  "92": {
+    "inputs": {
+      "mask": [
+        "91",
+        1
+      ]
+    },
+    "class_type": "InvertMask",
+    "_meta": {
+      "title": "反转遮罩"
+    }
+  },
+  "93": {
+    "inputs": {
+      "text": "立即抢购"
+    },
+    "class_type": "CR Text",
+    "_meta": {
+      "title": "文本"
+    }
+  },
+  "94": {
+    "inputs": {
+      "text": [
+        "93",
+        0
+      ],
+      "font_name": "PingFang-SC-Medium.ttf",
+      "font_size": 24,
+      "font_color": "custom",
+      "align": "top",
+      "justify": "left",
+      "margins": 0,
+      "line_spacing": 0,
+      "position_x": 51,
+      "position_y": 406,
+      "rotation_angle": 0,
+      "rotation_options": "text center",
+      "font_color_hex": "1A92FA",
+      "image": [
+        "95",
+        0
+      ]
+    },
+    "class_type": "CR Overlay Text",
+    "_meta": {
+      "title": "文字覆盖"
+    }
+  },
+  "95": {
+    "inputs": {
+      "overlay_resize": "None",
+      "resize_method": "nearest-exact",
+      "rescale_factor": 1,
+      "width": 512,
+      "height": 512,
+      "x_offset": 24,
+      "y_offset": 400,
+      "rotation": 0,
+      "opacity": 0,
+      "base_image": [
+        "88",
+        0
+      ],
+      "overlay_image": [
+        "91",
+        0
+      ],
+      "optional_mask": [
+        "92",
+        0
+      ]
+    },
+    "class_type": "Image Overlay",
+    "_meta": {
+      "title": "图像覆盖"
+    }
+  },
+  "96": {
+    "inputs": {
+      "images": [
+        "94",
+        0
+      ]
+    },
+    "class_type": "PreviewImage",
+    "_meta": {
+      "title": "预览图像"
+    }
+  },
+  "97": {
+    "inputs": {
+      "image": "轮播点.png"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "加载图像"
+    }
+  },
+  "98": {
+    "inputs": {
+      "overlay_resize": "None",
+      "resize_method": "nearest-exact",
+      "rescale_factor": 1,
+      "width": 512,
+      "height": 512,
+      "x_offset": 0,
+      "y_offset": 460,
+      "rotation": 0,
+      "opacity": 0,
+      "base_image": [
+        "94",
+        0
+      ],
+      "overlay_image": [
+        "97",
+        0
+      ],
+      "optional_mask": [
+        "97",
+        1
+      ]
+    },
+    "class_type": "Image Overlay",
+    "_meta": {
+      "title": "图像覆盖"
+    }
+  },
+  "99": {
+    "inputs": {
+      "images": [
+        "98",
+        0
+      ]
+    },
+    "class_type": "PreviewImage",
+    "_meta": {
+      "title": "预览图像"
+    }
+  },
+  "100": {
+    "inputs": {
+      "rounded_rect_radius": 40,
+      "anti_aliasing": 16,
+      "top": 0,
+      "bottom": 0,
+      "left": 0,
+      "right": 0,
+      "detect": "mask_area",
+      "obj_ext_top": 0,
+      "obj_ext_bottom": 0,
+      "obj_ext_left": 0,
+      "obj_ext_right": 0,
+      "image": [
+        "101",
+        0
+      ]
+    },
+    "class_type": "LayerUtility: RoundedRectangle",
+    "_meta": {
+      "title": "图层工具：圆角矩形"
+    }
+  },
+  "101": {
+    "inputs": {
+      "panel_width": 154,
+      "panel_height": 36,
+      "fill_color": "custom",
+      "fill_color_hex": "0055CC"
+    },
+    "class_type": "CR Color Panel",
+    "_meta": {
+      "title": "颜色面板"
+    }
+  },
+  "102": {
+    "inputs": {
+      "mask": [
+        "100",
+        1
+      ]
+    },
+    "class_type": "InvertMask",
+    "_meta": {
+      "title": "反转遮罩"
+    }
+  },
+  "103": {
+    "inputs": {
+      "text": "标签文案区"
+    },
+    "class_type": "CR Text",
+    "_meta": {
+      "title": "文本"
+    }
+  },
+  "104": {
+    "inputs": {
+      "text": [
+        "103",
+        0
+      ],
+      "font_name": "PingFang-SC-Medium.ttf",
+      "font_size": 24,
+      "font_color": "custom",
+      "align": "top",
+      "justify": "left",
+      "margins": 0,
+      "line_spacing": 0,
+      "position_x": 42,
+      "position_y": 25,
+      "rotation_angle": 0,
+      "rotation_options": "text center",
+      "font_color_hex": "ffffff",
+      "image": [
+        "105",
+        0
+      ]
+    },
+    "class_type": "CR Overlay Text",
+    "_meta": {
+      "title": "文字覆盖"
+    }
+  },
+  "105": {
+    "inputs": {
+      "overlay_resize": "None",
+      "resize_method": "nearest-exact",
+      "rescale_factor": 1,
+      "width": 512,
+      "height": 512,
+      "x_offset": 24,
+      "y_offset": 24,
+      "rotation": 0,
+      "opacity": 0,
+      "base_image": [
+        "98",
+        0
+      ],
+      "overlay_image": [
+        "100",
+        0
+      ],
+      "optional_mask": [
+        "102",
+        0
+      ]
+    },
+    "class_type": "Image Overlay",
+    "_meta": {
+      "title": "图像覆盖"
+    }
+  },
+  "106": {
+    "inputs": {
+      "images": [
+        "105",
+        0
+      ]
+    },
+    "class_type": "PreviewImage",
+    "_meta": {
+      "title": "预览图像"
+    }
+  },
+  "107": {
+    "inputs": {
+      "images": [
+        "104",
+        0
+      ]
+    },
+    "class_type": "PreviewImage",
+    "_meta": {
+      "title": "预览图像"
+    }
+  },
+  "109": {
+    "inputs": {
+      "image": "doodle.png"
+    },
+    "class_type": "LoadImage",
+    "_meta": {
+      "title": "加载图像"
+    }
+  },
+  "111": {
+    "inputs": {
+      "upscale_method": "nearest-exact",
+      "width": 158,
+      "height": 158,
+      "crop": "disabled",
+      "image": [
+        "109",
+        0
+      ]
+    },
+    "class_type": "ImageScale",
+    "_meta": {
+      "title": "缩放图像"
+    }
+  },
+  "119": {
+    "inputs": {
+      "height": 158,
+      "width": 158,
+      "interpolation_mode": "bicubic",
+      "mask": [
+        "109",
+        1
+      ]
+    },
+    "class_type": "JWMaskResize",
+    "_meta": {
+      "title": "Mask Resize"
+    }
+  },
+  "120": {
+    "inputs": {
+      "image": [
+        "111",
+        0
+      ],
+      "alpha": [
+        "119",
+        0
+      ]
+    },
+    "class_type": "JoinImageWithAlpha",
+    "_meta": {
+      "title": "合并图像Alpha"
+    }
+  },
+  "121": {
+    "inputs": {
+      "filename_prefix": "ComfyUI",
+      "images": [
+        "133",
+        0
+      ]
+    },
+    "class_type": "SaveImage",
+    "_meta": {
+      "title": "doodle2"
+    }
+  },
+  "132": {
+    "inputs": {
+      "add_width": 2,
+      "add_height": 2,
+      "method": "constant",
+      "images": [
+        "120",
+        0
+      ]
+    },
+    "class_type": "ImageTransformPaddingAbsolute",
+    "_meta": {
+      "title": "ImageTransformPaddingAbsolute"
+    }
+  },
+  "133": {
+    "inputs": {
+      "text": "为爱投票\n领20元津贴",
+      "font_name": "方正兰亭中粗黑_GBK.ttf",
+      "font_size": 30,
+      "font_color": "custom",
+      "align": "center",
+      "justify": "center",
+      "margins": 0,
+      "line_spacing": 6,
+      "position_x": 0,
+      "position_y": 50,
+      "rotation_angle": 0,
+      "rotation_options": "text center",
+      "font_color_hex": "000000",
+      "image": [
+        "132",
+        0
+      ]
+    },
+    "class_type": "CR Overlay Text",
+    "_meta": {
+      "title": "文字覆盖"
+    }
+  },
+  "134": {
+    "inputs": {
+      "text": "加入会员",
+      "font_name": "方正兰亭中粗黑_GBK.ttf",
+      "font_size": 30,
+      "font_color": "custom",
+      "align": "center",
+      "justify": "center",
+      "margins": 0,
+      "line_spacing": 0,
+      "position_x": 0,
+      "position_y": 64,
+      "rotation_angle": 0,
+      "rotation_options": "text center",
+      "font_color_hex": "#000000",
+      "image": [
+        "132",
+        0
+      ]
+    },
+    "class_type": "CR Overlay Text",
+    "_meta": {
+      "title": "文字覆盖"
+    }
+  },
+  "135": {
+    "inputs": {
+      "filename_prefix": "ComfyUI",
+      "images": [
+        "134",
+        0
+      ]
+    },
+    "class_type": "SaveImage",
+    "_meta": {
+      "title": "doodle1"
+    }
+  }
+}
