@@ -116,6 +116,7 @@ export class MockProvider implements OneThingProvider {
   }
 
   async submit(): Promise<string> {
+    // Mock 不需要 ctx，立即返回一个本地任务 id
     return `mock-task-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
   }
 

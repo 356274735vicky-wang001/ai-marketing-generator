@@ -1,13 +1,20 @@
 /**
- * 真实 OneThingAI 适配器（占位骨架）。
+ * 真实 OneThingAI / ComfyOne 适配器。
+ * 文档：https://docs.onethingai.com/78614/91a0d
  *
- * ⚠️ 待补：当前项目文档未提供 OneThingAI 平台真实 API 规格，以下每个方法都标注了
- * 接入时需要确认的信息。拿到规格后实现这几个方法，并在 .env 设置 ONETHING_PROVIDER=real。
+ * 流程：
+ *   uploadImage  → POST /v1/files            （素材上传，返回 path）
+ *   submit       → POST /v1/prompts          （提交任务，返回 taskId）
+ *   poll         → GET  /v1/prompts/{id}/status（查询状态 + 取图 URL，下载为二进制）
  *
- * 安全约束：API Key 只在此服务端文件通过 process.env 读取，永不下发前端。
+ * 安全：API Key / 实例 ID 只在服务端通过环境变量读取（见 comfyone.ts），不下发前端、不打日志。
+ *
+ * ⚠️ 节点→params 字段名、输出节点 ID 待用 API 格式工作流核对（见 comfyone-map.ts）。
  */
+import * as comfyone from "./comfyone";
+import { buildPromptInputs, outputNodesForMode } from "./comfyone-map";
 import type { OneThingProvider, PollResult, SubmitContext } from "./provider";
-import type { UploadFieldKey } from "@/lib/types";
+import type { ProviderImage, UploadFieldKey } from "@/lib/types";
 
 function requireEnv(name: string): string {
   const v = process.env[name];
@@ -18,38 +25,54 @@ function requireEnv(name: string): string {
 export class RealOneThingProvider implements OneThingProvider {
   readonly name = "real";
 
-  private get apiKey() {
-    return requireEnv("ONETHING_API_KEY");
-  }
-  private get instanceId() {
+  /** 已注册的工作流 ID（沿用既有环境变量名） */
+  private get workflowId() {
     return requireEnv("ONETHING_WORKFLOW_INSTANCE_ID");
   }
-  private get baseUrl() {
-    return process.env.ONETHING_BASE_URL ?? "https://api.onethingai.com";
+  /** 可选：指定运行的 GPU 后端实例 */
+  private get backend() {
+    return process.env.ONETHING_BACKEND_ID || undefined;
   }
 
   async uploadImage(
-    _buffer: Buffer,
-    _filename: string,
+    buffer: Buffer,
+    filename: string,
     _field: UploadFieldKey
   ): Promise<string> {
-    // TODO(接入): 确认 OneThingAI 是否有独立上传接口；返回的是文件名 / URL / 文件ID？
-    // 该返回值会被写入 ComfyUI LoadImage 节点的 widgets_values[0]。
-    void this.apiKey;
-    void this.baseUrl;
-    throw new Error("RealOneThingProvider.uploadImage 未实现：需 OneThingAI 上传接口规格");
+    return comfyone.uploadFile(buffer, filename || "upload.png");
   }
 
-  async submit(_workflow: unknown, _ctx: SubmitContext): Promise<string> {
-    // TODO(接入): 确认提交工作流的 endpoint / 方法 / 请求体（传完整 workflow 还是
-    // instanceId + 覆盖参数？），以及鉴权头格式。返回 provider 侧任务 ID。
-    void this.instanceId;
-    throw new Error("RealOneThingProvider.submit 未实现：需 OneThingAI 运行接口规格");
+  async submit(ctx: SubmitContext): Promise<string> {
+    const inputs = buildPromptInputs(ctx.uploaded, ctx.fields, ctx.doodleMode);
+    return comfyone.submitPrompt({
+      workflowId: this.workflowId,
+      inputs,
+      backend: this.backend,
+      freeCache: false,
+    });
   }
 
-  async poll(_providerTaskId: string, _ctx: SubmitContext): Promise<PollResult> {
-    // TODO(接入): 确认任务状态查询 endpoint、状态枚举、结果取图方式（URL / base64 / /view），
-    // 以及 5 张营销图（当前为 PreviewImage）如何取回（是否需补 SaveImage 节点）。
-    throw new Error("RealOneThingProvider.poll 未实现：需 OneThingAI 任务/结果接口规格");
+  async poll(taskId: string, ctx: SubmitContext): Promise<PollResult> {
+    const r = await comfyone.getStatus(taskId);
+
+    if (r.status === "failed" || r.status === "cancel") {
+      return { status: "failed", error: `OneThingAI 任务${r.status === "cancel" ? "已取消" : "失败"}` };
+    }
+    if (r.status !== "finished") {
+      return { status: "running" }; // pendding / pending / running
+    }
+
+    // finished：按 outputs 顺序把图片 URL 映射回我们的输出 id，并下载为二进制
+    const order = outputNodesForMode(ctx.doodleMode);
+    const urls = r.images ?? [];
+    const images: ProviderImage[] = [];
+    for (let i = 0; i < order.length && i < urls.length; i++) {
+      const buffer = await comfyone.fetchImage(urls[i]);
+      images.push({ id: order[i].ourId, buffer });
+    }
+    if (images.length === 0) {
+      return { status: "failed", error: "OneThingAI 返回结果为空" };
+    }
+    return { status: "success", images };
   }
 }

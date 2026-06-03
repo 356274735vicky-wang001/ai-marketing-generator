@@ -5,7 +5,7 @@
  * 接入真实 OneThingAI 时只需新增一个实现并在 client.ts 切换，前端与 API 路由无需改动。
  */
 import type { OutputSpec } from "./node-map";
-import type { ProviderImage, UploadFieldKey } from "@/lib/types";
+import type { GenerateTextFields, ProviderImage, UploadFieldKey } from "@/lib/types";
 
 /** 适配器任务状态 */
 export type ProviderStatus = "pending" | "running" | "success" | "failed";
@@ -14,9 +14,12 @@ export interface SubmitContext {
   /** 本次需要产出的输出位（含尺寸 / 是否 Doodle / 是否透明） */
   outputs: OutputSpec[];
   doodleMode: "single" | "double";
+  /** 已上传素材的引用（真实适配器写入 LoadImage 输入；Mock 忽略） */
+  uploaded: Record<UploadFieldKey, string>;
+  /** 文案 + 颜色字段（真实适配器构建 params；Mock 用于渲染中文占位） */
+  fields: GenerateTextFields;
   /**
-   * 各输出图要展示的中文样例文案，键为输出 id。
-   * Mock 适配器用它在占位图上渲染真实中文，便于验证字体；真实适配器忽略。
+   * 各输出图要展示的中文样例文案，键为输出 id（Mock 占位图渲染用，真实适配器忽略）。
    */
   labels?: Record<string, string>;
 }
@@ -36,8 +39,8 @@ export interface OneThingProvider {
     filename: string,
     field: UploadFieldKey
   ): Promise<string>;
-  /** 提交工作流运行，返回 provider 侧任务 ID */
-  submit(workflow: unknown, ctx: SubmitContext): Promise<string>;
-  /** 轮询任务状态 / 取结果 */
+  /** 提交任务，返回 provider 侧任务 ID */
+  submit(ctx: SubmitContext): Promise<string>;
+  /** 轮询一次任务状态 / 取结果（编排层负责循环直至终态） */
   poll(providerTaskId: string, ctx: SubmitContext): Promise<PollResult>;
 }
