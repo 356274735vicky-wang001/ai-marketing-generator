@@ -2,19 +2,38 @@
 /**
  * 一次性脚本：把 ComfyUI API 格式工作流注册到 ComfyOne，拿到 workflow_id。
  *
- * 用法（API Key 通过环境变量传入，不要写进代码/文件）：
- *   ONETHING_API_KEY=你的key node scripts/register-comfyone-workflow.mjs
- *   # 可选：ONETHING_BASE_URL=...  自定义 workflow 文件路径作为第 1 个参数
+ * 用法（自动读取项目根目录 .env.local 里的 ONETHING_API_KEY，无需写进命令）：
+ *   node scripts/register-comfyone-workflow.mjs
+ *   # 可选：自定义 workflow 文件路径作为第 1 个参数
  *
- * 成功后会打印 workflow_id，把它配到环境变量 ONETHING_WORKFLOW_INSTANCE_ID。
+ * 成功后会打印 workflow_id，把它配到 .env.local 的 ONETHING_WORKFLOW_INSTANCE_ID。
  */
 import fs from "node:fs";
 import path from "node:path";
 
+/** 读取 .env.local（已被 gitignore），把其中变量注入 process.env（不覆盖已存在的） */
+function loadEnvLocal() {
+  const p = path.join(process.cwd(), ".env.local");
+  if (!fs.existsSync(p)) return;
+  for (const line of fs.readFileSync(p, "utf8").split("\n")) {
+    const s = line.trim();
+    if (!s || s.startsWith("#")) continue;
+    const i = s.indexOf("=");
+    if (i === -1) continue;
+    const k = s.slice(0, i).trim();
+    let v = s.slice(i + 1).trim();
+    if ((v.startsWith('"') && v.endsWith('"')) || (v.startsWith("'") && v.endsWith("'"))) {
+      v = v.slice(1, -1);
+    }
+    if (!(k in process.env)) process.env[k] = v;
+  }
+}
+loadEnvLocal();
+
 const BASE = (process.env.ONETHING_BASE_URL || "https://pandora-server-cf.onethingai.com").replace(/\/+$/, "");
 const KEY = process.env.ONETHING_API_KEY;
-if (!KEY) {
-  console.error("缺少环境变量 ONETHING_API_KEY");
+if (!KEY || KEY === "replace_me_locally") {
+  console.error("未在 .env.local 找到有效的 ONETHING_API_KEY（请先填好真实 Key）");
   process.exit(1);
 }
 const wfPath = process.argv[2] || path.join(process.cwd(), "workflow", "一键换图生图_API.json");
