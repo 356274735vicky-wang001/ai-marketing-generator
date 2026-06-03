@@ -41,7 +41,7 @@ async function parseEnvelope<T>(res: Response, what: string): Promise<T> {
   return json.data;
 }
 
-/** 上传一张图片，返回可作为图片输入的 path */
+/** 上传一张图片，返回可作为图片输入的 path/URL（写入 LoadImage 的 image 字段） */
 export async function uploadFile(
   buffer: Buffer,
   filename: string,
@@ -54,9 +54,14 @@ export async function uploadFile(
     headers: authHeader(), // 不要手动设 Content-Type，让 fetch 带 multipart boundary
     body: form,
   });
-  const data = await parseEnvelope<{ path: string }>(res, "上传图片");
-  if (!data?.path) throw new Error("上传图片失败：响应缺少 path");
-  return data.path;
+  const data = await parseEnvelope<Record<string, unknown>>(res, "上传图片");
+  // ComfyOne 实际返回 data.Path（大写）；兼容其它常见命名
+  const ref =
+    data?.Path ?? data?.path ?? data?.url ?? data?.URL ?? data?.filename ?? data?.name;
+  if (typeof ref !== "string" || !ref) {
+    throw new Error(`上传图片失败：响应缺少文件地址字段（实际键：${Object.keys(data ?? {}).join(",")}）`);
+  }
+  return ref;
 }
 
 export interface ComfyOnePromptInput {
