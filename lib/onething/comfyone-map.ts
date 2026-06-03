@@ -44,6 +44,21 @@ function hex(v: string): string {
 }
 
 /**
+ * 文案清洗（传给 ComfyUI 前）：
+ * - CRLF/CR → LF（textarea 提交会带 \r，ComfyUI 会把 \r 渲染成方块 □）
+ * - 去除除 \n 外的所有 C0/C1 控制字符与 DEL
+ * - 去除零宽字符 / BOM
+ * - 去首尾空白；不拼接任何额外字符
+ */
+export function sanitizeText(s: string): string {
+  return s
+    .replace(/\r\n?/g, "\n")
+    .replace(/[\u0000-\u0009\u000B-\u001F\u007F-\u009F]/g, "")
+    .replace(/[\u200B-\u200D\uFEFF]/g, "")
+    .trim();
+}
+
+/**
  * 构建 POST /v1/prompts 的 inputs：按节点 ID 聚合 params（一个节点可同时有文本+颜色）。
  */
 export function buildPromptInputs(
@@ -65,12 +80,12 @@ export function buildPromptInputs(
     if (ref) put(IMAGE_BINDINGS[field], PARAM_KEYS.loadImage, ref);
   });
 
-  // 营销图文案
+  // 营销图文案（清洗后再传）
   for (const b of TEXT_BINDINGS) {
     const v = fields[b.field];
     if (typeof v !== "string") continue;
     const key = b.op === "crText" ? PARAM_KEYS.crText : PARAM_KEYS.overlayText;
-    put(b.nodeId, key, v);
+    put(b.nodeId, key, sanitizeText(v));
   }
 
   // 颜色
@@ -81,13 +96,15 @@ export function buildPromptInputs(
     put(b.nodeId, key, hex(v));
   }
 
-  // Doodle（按模式只改对应节点）
+  // Doodle（按模式只改对应节点，文案同样清洗）
   if (mode === "single") {
-    put(DOODLE_NODES.singleTextNode, PARAM_KEYS.overlayText, fields.doodleSingleText);
+    put(DOODLE_NODES.singleTextNode, PARAM_KEYS.overlayText, sanitizeText(fields.doodleSingleText));
     if (fields.doodleTextColor)
       put(DOODLE_NODES.singleTextNode, PARAM_KEYS.overlayColor, hex(fields.doodleTextColor));
   } else {
-    put(DOODLE_NODES.doubleTextNode, PARAM_KEYS.overlayText, `${fields.doodleDoubleLine1}\n${fields.doodleDoubleLine2}`);
+    const line1 = sanitizeText(fields.doodleDoubleLine1);
+    const line2 = sanitizeText(fields.doodleDoubleLine2);
+    put(DOODLE_NODES.doubleTextNode, PARAM_KEYS.overlayText, `${line1}\n${line2}`);
     if (fields.doodleTextColor)
       put(DOODLE_NODES.doubleTextNode, PARAM_KEYS.overlayColor, hex(fields.doodleTextColor));
   }
