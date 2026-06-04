@@ -66,9 +66,21 @@ export interface GeneratedImage {
   pngBase64: string;
 }
 
-/** POST /api/generate 的同步响应 */
+/** POST /api/generate 的同步响应（旧版，保留类型以兼容） */
 export interface GenerateResponse {
   images: GeneratedImage[];
+}
+
+/** POST /api/generate/start 的响应：提交成功后立即返回 taskId */
+export interface StartResponse {
+  taskId: string;
+}
+
+/** GET /api/generate/status 的响应：前端按 status 轮询 */
+export interface StatusResponse {
+  status: "running" | "success" | "failed";
+  images?: GeneratedImage[];
+  message?: string;
 }
 
 /** OneThingAI 适配器从工作流执行后返回的单张原始图片 */

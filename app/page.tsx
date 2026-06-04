@@ -9,9 +9,14 @@ import { ActionBar } from "@/components/config-panel/ActionBar";
 import { ResultGrid } from "@/components/result/ResultGrid";
 import { DEFAULT_TEXT_FIELDS } from "@/lib/form-schema";
 import { isValidHex } from "@/lib/onething/hex";
-import type { GeneratedImage, GenerateResponse, GenerateTextFields, UploadFieldKey } from "@/lib/types";
+import type { GeneratedImage, GenerateTextFields, StartResponse, StatusResponse, UploadFieldKey } from "@/lib/types";
 
 type FilesState = Record<UploadFieldKey, File | null>;
+
+const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+// 前端轮询参数：单次请求短，整体由客户端预算兜底
+const POLL_INTERVAL_MS = 2500;
+const CLIENT_BUDGET_MS = 4 * 60 * 1000;
 
 const EMPTY_FILES: FilesState = {
   backgroundImage: null,
@@ -69,12 +74,32 @@ export default function Home() {
         fd.append(k, String(fields[k]));
       });
 
-      const res = await fetch("/api/generate", { method: "POST", body: fd });
-      const data = (await res.json()) as GenerateResponse & { message?: string };
-      if (!res.ok || !data.images) throw new Error(data.message || "生成失败，请稍后重试。");
+      // 1) 短请求：上传素材 + 提交任务，立即拿 taskId（避免单函数长等待触发 504）
+      const startRes = await fetch("/api/generate/start", { method: "POST", body: fd });
+      const startData = (await startRes.json()) as StartResponse & { message?: string };
+      if (!startRes.ok || !startData.taskId)
+        throw new Error(startData.message || "提交任务失败，请稍后重试。");
+      const taskId = startData.taskId;
 
-      setImages(data.images);
-      toast.success(`已生成 ${data.images.length} 张图片。`);
+      // 2) 前端轮询状态，直至成功 / 失败 / 超时
+      const mode = fields.doodleMode;
+      const deadline = Date.now() + CLIENT_BUDGET_MS;
+      for (;;) {
+        await sleep(POLL_INTERVAL_MS);
+        const statusRes = await fetch(
+          `/api/generate/status?taskId=${encodeURIComponent(taskId)}&mode=${mode}`
+        );
+        const statusData = (await statusRes.json()) as StatusResponse;
+        if (statusData.status === "success" && statusData.images) {
+          setImages(statusData.images);
+          toast.success(`已生成 ${statusData.images.length} 张图片。`);
+          break;
+        }
+        if (statusData.status === "failed")
+          throw new Error(statusData.message || "生成失败，请稍后重试。");
+        if (Date.now() > deadline) throw new Error("生成超时，请稍后重试。");
+        // status === "running" → 继续轮询
+      }
     } catch (e) {
       toast.error(e instanceof Error ? e.message : "生成失败，请稍后重试。");
     } finally {
