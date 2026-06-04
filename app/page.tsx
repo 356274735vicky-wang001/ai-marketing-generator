@@ -18,6 +18,33 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 const POLL_INTERVAL_MS = 2500;
 const CLIENT_BUDGET_MS = 4 * 60 * 1000;
 
+/**
+ * 安全解析 API 响应：先读文本、判 response.ok 与 JSON 合法性，绝不对非 JSON 直接 .json()。
+ * 命中 404/HTML（如缓存了旧版前端打到已删除的 /api/generate）时给出可操作提示，而非 "Unexpected token <"。
+ */
+async function readJsonResponse<T>(res: Response, label: string): Promise<T> {
+  const text = await res.text();
+  let data: unknown = null;
+  try {
+    data = text ? JSON.parse(text) : null;
+  } catch {
+    data = null;
+  }
+  if (!res.ok || data === null || typeof data !== "object") {
+    console.error(`[generate] ${label} 非预期响应 HTTP ${res.status}：`, text.slice(0, 300));
+    const serverMsg =
+      data && typeof data === "object" && typeof (data as { message?: unknown }).message === "string"
+        ? (data as { message: string }).message
+        : null;
+    const fallback =
+      res.status === 404
+        ? "接口未找到（404），页面可能缓存了旧版本。请按 Cmd/Ctrl + Shift + R 强制刷新后重试。"
+        : `生成服务异常（HTTP ${res.status}），请稍后重试。`;
+    throw new Error(serverMsg || fallback);
+  }
+  return data as T;
+}
+
 const EMPTY_FILES: FilesState = {
   backgroundImage: null,
   productImage: null,
@@ -76,9 +103,8 @@ export default function Home() {
 
       // 1) 短请求：上传素材 + 提交任务，立即拿 taskId（避免单函数长等待触发 504）
       const startRes = await fetch("/api/generate/start", { method: "POST", body: fd });
-      const startData = (await startRes.json()) as StartResponse & { message?: string };
-      if (!startRes.ok || !startData.taskId)
-        throw new Error(startData.message || "提交任务失败，请稍后重试。");
+      const startData = await readJsonResponse<StartResponse & { message?: string }>(startRes, "start");
+      if (!startData.taskId) throw new Error(startData.message || "提交任务失败，请稍后重试。");
       const taskId = startData.taskId;
 
       // 2) 前端轮询状态，直至成功 / 失败 / 超时
@@ -89,7 +115,7 @@ export default function Home() {
         const statusRes = await fetch(
           `/api/generate/status?taskId=${encodeURIComponent(taskId)}&mode=${mode}`
         );
-        const statusData = (await statusRes.json()) as StatusResponse;
+        const statusData = await readJsonResponse<StatusResponse>(statusRes, "status");
         if (statusData.status === "success" && statusData.images) {
           setImages(statusData.images);
           toast.success(`已生成 ${statusData.images.length} 张图片。`);
