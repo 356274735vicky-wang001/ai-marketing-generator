@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getProvider, getMockProvider, fallbackToMockEnabled } from "@/lib/onething/client";
+import { logOneThingDiagnostics } from "@/lib/onething/comfyone";
 import type { OneThingProvider, SubmitContext } from "@/lib/onething/provider";
 import { outputsForMode } from "@/lib/onething/node-map";
 import { textFieldsSchema, MAX_UPLOAD_BYTES, ACCEPTED_IMAGE_TYPES } from "@/lib/form-schema";
@@ -109,12 +110,19 @@ export async function POST(req: NextRequest) {
 
   // 3) 生成（真实失败时按开关回退 Mock）
   const provider = getProvider();
+  if (provider.name === "real") logOneThingDiagnostics();
   let providerImages: ProviderImage[];
+  const runStarted = Date.now();
   try {
     providerImages = await runWith(provider, uploads, fields);
+    console.info(`[generate] provider=${provider.name} 成功 | 耗时 ${Date.now() - runStarted}ms | ${providerImages.length} 张`);
   } catch (e) {
     const message = e instanceof Error ? e.message : "生成失败，请稍后重试。";
-    console.error("[generate] provider error:", message);
+    // 打印完整错误：name / message / cause / stack / 整轮耗时，便于定位 socket 断开发生在哪一步
+    console.error(
+      `[generate] provider=${provider.name} 失败 | 整轮耗时 ${Date.now() - runStarted}ms |`,
+      e instanceof Error ? { name: e.name, message: e.message, cause: (e as { cause?: unknown }).cause, stack: e.stack } : e
+    );
     if (provider.name !== "mock" && fallbackToMockEnabled()) {
       console.warn("[generate] 回退到 Mock 生成");
       try {
