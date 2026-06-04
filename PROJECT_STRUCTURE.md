@@ -1,8 +1,14 @@
 # PROJECT_STRUCTURE｜项目结构说明
 
+> **⚠️ 目录名 vs 代码状态**：本目录名为 `…-Handoff-v1.1`，但代码状态实际为
+> **`v1.0-real-generation-stable`**（已接入真实 OneThingAI / ComfyOne）。
+> 线上 https://generator.hellopeggywang.com 运行此版本；main = `2773d88`。
+> 同级 `…-Handoff-v1.2` 仅文档包，无代码、与线上无关。
+
 AI 营销宣传图生成器 —— Next.js 15 + TypeScript + Tailwind CSS + shadcn/ui。
-当前运行在 **Mock 模式**（后端用 sharp 合成占位图），OneThingAI 真实接入预留在
-Provider 适配器层，后续替换即可，前端与 API 路由无需改动。
+**当前默认 `ONETHING_PROVIDER=real`：通过 ComfyOne 调用真实 ComfyUI 工作流生成**
+（适配器层 `lib/onething/`：`mock-provider` 占位图 + `real-provider` 真实调用，由
+`client.ts` 按环境变量切换）。前端 / API 路由在 mock↔real 之间无需改动；真实失败可回退 Mock。
 
 ## 目录树
 

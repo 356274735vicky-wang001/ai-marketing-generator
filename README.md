@@ -1,5 +1,19 @@
 # AI 营销宣传图生成器｜Claude Code 开发交接包 V1.1
 
+> ## ⚠️ 目录名 vs 代码状态
+> 本文件夹名为 `AI-Marketing-Generator-Handoff-v1.1`，但**目录内代码状态实际为 `v1.0-real-generation-stable`**
+> —— 已接入真实 OneThingAI / ComfyOne，线上 **https://generator.hellopeggywang.com** 运行的就是此版本。
+>
+> | 项 | 值 |
+> |---|---|
+> | 线上地址 | https://generator.hellopeggywang.com |
+> | Vercel 项目 | `ai-marketing-generator`（本目录 `.vercel` 已关联）|
+> | GitHub 仓库 | github.com/356274735vicky-wang001/ai-marketing-generator |
+> | 分支 / Commit | `main` / `2773d88`（= origin/main，真实生成稳定版）|
+> | 回滚点 | tag `mvp-mock-version-stable`（Mock 版）|
+>
+> **同级目录 `AI-Marketing-Generator-Handoff-v1.2` 只是一个文档包**（仅 `README/docs/workflow`，无 `app/`、无 `package.json`、非 git、未连 Vercel），**与线上代码无关**。开发代码请始终使用本 v1.1 目录。
+
 ## 项目简介
 
 这是一个面向运营人员的 AI 设计生产工具。用户上传素材、填写文案、设置颜色后，系统调用 OneThingAI 上的 ComfyUI 工作流，一键生成 5 张营销宣传图 + 1 张 Doodle 图。
